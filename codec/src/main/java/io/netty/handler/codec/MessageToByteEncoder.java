@@ -113,7 +113,7 @@ public abstract class MessageToByteEncoder<I> extends ChannelOutboundHandlerAdap
                     ctx.write(buf, promise);
                 } else {
                     buf.release();
-                    ctx.write(Unpooled.EMPTY_BUFFER, promise);
+                    ctx.write(Unpooled.emptyBuffer(), promise);
                 }
                 buf = null;
             } else {

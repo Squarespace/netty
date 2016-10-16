@@ -14,7 +14,7 @@
  */
 package io.netty.handler.codec.http2;
 
-import static io.netty.buffer.Unpooled.EMPTY_BUFFER;
+import static io.netty.buffer.Unpooled.emptyBuffer;
 import static io.netty.buffer.Unpooled.wrappedBuffer;
 import static io.netty.handler.codec.http2.Http2CodecUtil.DEFAULT_PRIORITY_WEIGHT;
 import static io.netty.handler.codec.http2.Http2CodecUtil.emptyPingBuf;
@@ -258,7 +258,7 @@ public class DefaultHttp2ConnectionDecoderTest {
 
     @Test
     public void emptyDataFrameShouldApplyFlowControl() throws Exception {
-        final ByteBuf data = EMPTY_BUFFER;
+        final ByteBuf data = emptyBuffer();
         int padding = 0;
         mockFlowControl(0);
         try {
@@ -636,7 +636,7 @@ public class DefaultHttp2ConnectionDecoderTest {
     public void goawayIncreasedLastStreamIdShouldThrow() throws Exception {
         when(local.lastStreamKnownByPeer()).thenReturn(1);
         when(connection.goAwayReceived()).thenReturn(true);
-        decode().onGoAwayRead(ctx, 3, 2L, EMPTY_BUFFER);
+        decode().onGoAwayRead(ctx, 3, 2L, emptyBuffer());
     }
 
     @Test(expected = Http2Exception.class)
@@ -703,9 +703,9 @@ public class DefaultHttp2ConnectionDecoderTest {
 
     @Test
     public void goAwayShouldReadShouldUpdateConnectionState() throws Exception {
-        decode().onGoAwayRead(ctx, 1, 2L, EMPTY_BUFFER);
-        verify(connection).goAwayReceived(eq(1), eq(2L), eq(EMPTY_BUFFER));
-        verify(listener).onGoAwayRead(eq(ctx), eq(1), eq(2L), eq(EMPTY_BUFFER));
+        decode().onGoAwayRead(ctx, 1, 2L, emptyBuffer());
+        verify(connection).goAwayReceived(eq(1), eq(2L), eq(emptyBuffer()));
+        verify(listener).onGoAwayRead(eq(ctx), eq(1), eq(2L), eq(emptyBuffer()));
     }
 
     private static ByteBuf dummyData() {
@@ -719,7 +719,7 @@ public class DefaultHttp2ConnectionDecoderTest {
     private Http2FrameListener decode() throws Exception {
         ArgumentCaptor<Http2FrameListener> internallistener = ArgumentCaptor.forClass(Http2FrameListener.class);
         doNothing().when(reader).readFrame(eq(ctx), any(ByteBuf.class), internallistener.capture());
-        decoder.decodeFrame(ctx, EMPTY_BUFFER, Collections.emptyList());
+        decoder.decodeFrame(ctx, emptyBuffer(), Collections.emptyList());
         return internallistener.getValue();
     }
 

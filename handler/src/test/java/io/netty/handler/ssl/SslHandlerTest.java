@@ -147,7 +147,7 @@ public class SslHandlerTest {
           ch.config().setAutoRead(false);
           assertFalse(ch.config().isAutoRead());
 
-          assertTrue(ch.writeOutbound(Unpooled.EMPTY_BUFFER));
+          assertTrue(ch.writeOutbound(Unpooled.emptyBuffer()));
           assertTrue(readIssued);
           assertTrue(ch.finishAndReleaseAll());
        }

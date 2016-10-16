@@ -39,7 +39,7 @@ import org.mockito.stubbing.Answer;
 import java.util.LinkedList;
 import java.util.List;
 
-import static io.netty.buffer.Unpooled.EMPTY_BUFFER;
+import static io.netty.buffer.Unpooled.emptyBuffer;
 import static io.netty.handler.codec.http2.Http2CodecUtil.DEFAULT_HEADER_LIST_SIZE;
 import static io.netty.handler.codec.http2.Http2CodecUtil.MAX_PADDING;
 import static io.netty.handler.codec.http2.Http2HeadersEncoder.NEVER_SENSITIVE;
@@ -144,7 +144,7 @@ public class Http2FrameRoundtripTest {
 
     @Test
     public void emptyDataShouldMatch() throws Exception {
-        final ByteBuf data = EMPTY_BUFFER;
+        final ByteBuf data = emptyBuffer();
         writer.writeData(ctx, STREAM_ID, data.slice(), 0, false, ctx.newPromise());
         readFrames();
         verify(listener).onDataRead(eq(ctx), eq(STREAM_ID), eq(data), eq(0), eq(false));

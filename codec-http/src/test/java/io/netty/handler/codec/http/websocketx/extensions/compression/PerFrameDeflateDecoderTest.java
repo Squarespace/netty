@@ -102,7 +102,7 @@ public class PerFrameDeflateDecoderTest {
                 ZlibCodecFactory.newZlibEncoder(ZlibWrapper.NONE, 9, 15, 8));
         EmbeddedChannel decoderChannel = new EmbeddedChannel(new PerFrameDeflateDecoder(false));
 
-        encoderChannel.writeOutbound(Unpooled.EMPTY_BUFFER);
+        encoderChannel.writeOutbound(Unpooled.emptyBuffer());
         ByteBuf compressedPayload = encoderChannel.readOutbound();
         BinaryWebSocketFrame compressedFrame =
                 new BinaryWebSocketFrame(true, WebSocketExtension.RSV1 | WebSocketExtension.RSV3, compressedPayload);

@@ -15,7 +15,7 @@
 
 package io.netty.handler.codec.http2;
 
-import static io.netty.buffer.Unpooled.EMPTY_BUFFER;
+import static io.netty.buffer.Unpooled.emptyBuffer;
 import static io.netty.handler.codec.http2.Http2CodecUtil.DEFAULT_MAX_FRAME_SIZE;
 import static io.netty.handler.codec.http2.Http2CodecUtil.DEFAULT_PRIORITY_WEIGHT;
 import static io.netty.handler.codec.http2.Http2CodecUtil.SMALLEST_MAX_CONCURRENT_STREAMS;
@@ -204,9 +204,9 @@ public class StreamBufferingEncoderTest {
         assertEquals(1, connection.numActiveStreams());
         assertEquals(1, encoder.numBufferedStreams());
 
-        encoder.writeData(ctx, 3, EMPTY_BUFFER, 0, false, newPromise());
+        encoder.writeData(ctx, 3, emptyBuffer(), 0, false, newPromise());
         writeVerifyWriteHeaders(times(1), 3);
-        encoder.writeData(ctx, 5, EMPTY_BUFFER, 0, false, newPromise());
+        encoder.writeData(ctx, 5, emptyBuffer(), 0, false, newPromise());
         verify(writer, never())
                 .writeData(eq(ctx), eq(5), any(ByteBuf.class), eq(0), eq(false), eq(newPromise()));
     }
@@ -215,7 +215,7 @@ public class StreamBufferingEncoderTest {
     public void bufferingNewStreamFailsAfterGoAwayReceived() {
         encoder.writeSettingsAck(ctx, newPromise());
         setMaxConcurrentStreams(0);
-        connection.goAwayReceived(1, 8, EMPTY_BUFFER);
+        connection.goAwayReceived(1, 8, emptyBuffer());
 
         ChannelPromise promise = newPromise();
         encoderWriteHeaders(3, promise);
@@ -237,7 +237,7 @@ public class StreamBufferingEncoderTest {
         }
         assertEquals(4, encoder.numBufferedStreams());
 
-        connection.goAwayReceived(11, 8, EMPTY_BUFFER);
+        connection.goAwayReceived(11, 8, emptyBuffer());
 
         assertEquals(5, connection.numActiveStreams());
         int failCount = 0;
@@ -280,7 +280,7 @@ public class StreamBufferingEncoderTest {
         encoderWriteHeaders(3, newPromise());
         assertEquals(1, encoder.numBufferedStreams());
 
-        encoder.writeData(ctx, 3, EMPTY_BUFFER, 0, true, newPromise());
+        encoder.writeData(ctx, 3, emptyBuffer(), 0, true, newPromise());
 
         assertEquals(0, connection.numActiveStreams());
         assertEquals(1, encoder.numBufferedStreams());

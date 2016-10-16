@@ -132,9 +132,9 @@ public class HttpResponseEncoderTest {
         EmbeddedChannel channel = new EmbeddedChannel(new HttpResponseEncoder());
 
         // Test writing an empty buffer works when the encoder is at ST_INIT.
-        channel.writeOutbound(Unpooled.EMPTY_BUFFER);
+        channel.writeOutbound(Unpooled.emptyBuffer());
         ByteBuf buffer = channel.readOutbound();
-        assertThat(buffer, is(sameInstance(Unpooled.EMPTY_BUFFER)));
+        assertThat(buffer, is(sameInstance(Unpooled.emptyBuffer())));
 
         // Leave the ST_INIT state.
         HttpResponse response = new DefaultHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK);
@@ -144,9 +144,9 @@ public class HttpResponseEncoderTest {
         buffer.release();
 
         // Test writing an empty buffer works when the encoder is not at ST_INIT.
-        channel.writeOutbound(Unpooled.EMPTY_BUFFER);
+        channel.writeOutbound(Unpooled.emptyBuffer());
         buffer = channel.readOutbound();
-        assertThat(buffer, is(sameInstance(Unpooled.EMPTY_BUFFER)));
+        assertThat(buffer, is(sameInstance(Unpooled.emptyBuffer())));
 
         assertFalse(channel.finish());
     }

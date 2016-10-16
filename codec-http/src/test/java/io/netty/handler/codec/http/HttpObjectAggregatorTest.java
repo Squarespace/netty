@@ -52,7 +52,7 @@ public class HttpObjectAggregatorTest {
         message.headers().set(of("X-Test"), true);
         HttpContent chunk1 = new DefaultHttpContent(Unpooled.copiedBuffer("test", CharsetUtil.US_ASCII));
         HttpContent chunk2 = new DefaultHttpContent(Unpooled.copiedBuffer("test2", CharsetUtil.US_ASCII));
-        HttpContent chunk3 = new DefaultLastHttpContent(Unpooled.EMPTY_BUFFER);
+        HttpContent chunk3 = new DefaultLastHttpContent(Unpooled.emptyBuffer());
         assertFalse(embedder.writeInbound(message));
         assertFalse(embedder.writeInbound(chunk1));
         assertFalse(embedder.writeInbound(chunk2));

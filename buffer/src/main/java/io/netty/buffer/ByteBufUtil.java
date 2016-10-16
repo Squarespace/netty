@@ -64,6 +64,7 @@ public final class ByteBufUtil {
     private static final int MAX_BYTES_PER_CHAR_UTF8 =
             (int) CharsetUtil.encoder(CharsetUtil.UTF_8).maxBytesPerChar();
 
+    static final boolean EMPTY_SINGLETON = SystemPropertyUtil.getBoolean("io.netty.allocator.emptySingleton", true);
     static final ByteBufAllocator DEFAULT_ALLOCATOR;
 
     static {

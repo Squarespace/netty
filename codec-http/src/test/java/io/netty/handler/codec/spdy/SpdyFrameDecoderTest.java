@@ -164,7 +164,7 @@ public class SpdyFrameDecoderTest {
         ByteBuf buf = ReferenceCountUtil.releaseLater(Unpooled.buffer(SPDY_HEADER_SIZE + length));
         encodeDataFrameHeader(buf, streamId, flags, length);
 
-        delegate.readDataFrame(streamId, false, Unpooled.EMPTY_BUFFER);
+        delegate.readDataFrame(streamId, false, Unpooled.emptyBuffer());
         replay(delegate);
         decoder.decode(buf);
         verify(delegate);
@@ -180,7 +180,7 @@ public class SpdyFrameDecoderTest {
         ByteBuf buf = ReferenceCountUtil.releaseLater(Unpooled.buffer(SPDY_HEADER_SIZE + length));
         encodeDataFrameHeader(buf, streamId, flags, length);
 
-        delegate.readDataFrame(streamId, true, Unpooled.EMPTY_BUFFER);
+        delegate.readDataFrame(streamId, true, Unpooled.emptyBuffer());
         replay(delegate);
         decoder.decode(buf);
         verify(delegate);
@@ -196,7 +196,7 @@ public class SpdyFrameDecoderTest {
         ByteBuf buf = ReferenceCountUtil.releaseLater(Unpooled.buffer(SPDY_HEADER_SIZE + length));
         encodeDataFrameHeader(buf, streamId, flags, length);
 
-        delegate.readDataFrame(streamId, false, Unpooled.EMPTY_BUFFER);
+        delegate.readDataFrame(streamId, false, Unpooled.emptyBuffer());
         replay(delegate);
         decoder.decode(buf);
         verify(delegate);
@@ -230,8 +230,8 @@ public class SpdyFrameDecoderTest {
         encodeDataFrameHeader(buf, streamId1, flags, length);
         encodeDataFrameHeader(buf, streamId2, flags, length);
 
-        delegate.readDataFrame(streamId1, false, Unpooled.EMPTY_BUFFER);
-        delegate.readDataFrame(streamId2, false, Unpooled.EMPTY_BUFFER);
+        delegate.readDataFrame(streamId1, false, Unpooled.emptyBuffer());
+        delegate.readDataFrame(streamId2, false, Unpooled.emptyBuffer());
         replay(delegate);
         decoder.decode(buf);
         verify(delegate);

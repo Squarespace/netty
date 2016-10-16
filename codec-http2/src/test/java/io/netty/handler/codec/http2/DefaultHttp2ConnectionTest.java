@@ -471,7 +471,7 @@ public class DefaultHttp2ConnectionTest {
 
     @Test(expected = Http2Exception.class)
     public void goAwayReceivedShouldDisallowCreation() throws Http2Exception {
-        server.goAwayReceived(0, 1L, Unpooled.EMPTY_BUFFER);
+        server.goAwayReceived(0, 1L, Unpooled.emptyBuffer());
         server.remote().createStream(3, true);
     }
 
@@ -1143,12 +1143,12 @@ public class DefaultHttp2ConnectionTest {
             verify(clientListener).onStreamRemoved(any(Http2Stream.class));
             verify(clientListener2).onStreamRemoved(any(Http2Stream.class));
 
-            client.goAwaySent(client.connectionStream().id(), Http2Error.INTERNAL_ERROR.code(), Unpooled.EMPTY_BUFFER);
+            client.goAwaySent(client.connectionStream().id(), Http2Error.INTERNAL_ERROR.code(), Unpooled.emptyBuffer());
             verify(clientListener).onGoAwaySent(anyInt(), anyLong(), any(ByteBuf.class));
             verify(clientListener2).onGoAwaySent(anyInt(), anyLong(), any(ByteBuf.class));
 
             client.goAwayReceived(client.connectionStream().id(),
-                    Http2Error.INTERNAL_ERROR.code(), Unpooled.EMPTY_BUFFER);
+                    Http2Error.INTERNAL_ERROR.code(), Unpooled.emptyBuffer());
             verify(clientListener).onGoAwayReceived(anyInt(), anyLong(), any(ByteBuf.class));
             verify(clientListener2).onGoAwayReceived(anyInt(), anyLong(), any(ByteBuf.class));
         } finally {

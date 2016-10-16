@@ -178,7 +178,7 @@ public class StompSubframeDecoder extends ReplayingDecoder<State> {
                     resetDecoder();
             }
         } catch (Exception e) {
-            StompContentSubframe errorContent = new DefaultLastStompContentSubframe(Unpooled.EMPTY_BUFFER);
+            StompContentSubframe errorContent = new DefaultLastStompContentSubframe(Unpooled.emptyBuffer());
             errorContent.setDecoderResult(DecoderResult.failure(e));
             out.add(errorContent);
             checkpoint(State.BAD_FRAME);

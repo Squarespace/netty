@@ -108,7 +108,7 @@ public final class CoalescingBufferQueue {
 
         // Use isEmpty rather than readableBytes==0 as we may have a promise associated with an empty buffer.
         if (bufAndListenerPairs.isEmpty()) {
-            return Unpooled.EMPTY_BUFFER;
+            return Unpooled.emptyBuffer();
         }
         bytes = Math.min(bytes, readableBytes);
 

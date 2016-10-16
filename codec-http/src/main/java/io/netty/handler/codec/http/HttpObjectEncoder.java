@@ -27,7 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
 
-import static io.netty.buffer.Unpooled.EMPTY_BUFFER;
+import static io.netty.buffer.Unpooled.emptyBuffer;
 import static io.netty.buffer.Unpooled.directBuffer;
 import static io.netty.buffer.Unpooled.unreleasableBuffer;
 import static io.netty.handler.codec.http.HttpConstants.CR;
@@ -82,12 +82,12 @@ public abstract class HttpObjectEncoder<H extends HttpMessage> extends MessageTo
 
         // Bypass the encoder in case of an empty buffer, so that the following idiom works:
         //
-        //     ch.write(Unpooled.EMPTY_BUFFER).addListener(ChannelFutureListener.CLOSE);
+        //     ch.write(Unpooled.emptyBuffer()).addListener(ChannelFutureListener.CLOSE);
         //
         // See https://github.com/netty/netty/issues/2983 for more information.
 
         if (msg instanceof ByteBuf && !((ByteBuf) msg).isReadable()) {
-            out.add(EMPTY_BUFFER);
+            out.add(emptyBuffer());
             return;
         }
 
@@ -116,7 +116,7 @@ public abstract class HttpObjectEncoder<H extends HttpMessage> extends MessageTo
                     } else {
                         // Need to produce some output otherwise an
                         // IllegalStateException will be thrown
-                        out.add(EMPTY_BUFFER);
+                        out.add(emptyBuffer());
                     }
                 }
 
@@ -182,7 +182,7 @@ public abstract class HttpObjectEncoder<H extends HttpMessage> extends MessageTo
             if (contentLength == 0) {
                 // Need to produce some output otherwise an
                 // IllegalstateException will be thrown
-                out.add(EMPTY_BUFFER);
+                out.add(emptyBuffer());
             }
         }
     }

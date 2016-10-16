@@ -35,7 +35,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-import static io.netty.buffer.Unpooled.*;
+import static io.netty.buffer.Unpooled.buffer;
+import static io.netty.buffer.Unpooled.emptyBuffer;
 
 /**
  * This decoder will decode Body and can handle POST BODY.
@@ -474,7 +475,7 @@ public class HttpPostStandardRequestDecoder implements InterfaceHttpPostRequestD
                 if (ampersandpos > firstpos) {
                     setFinalBuffer(undecodedChunk.copy(firstpos, ampersandpos - firstpos));
                 } else if (!currentAttribute.isCompleted()) {
-                    setFinalBuffer(EMPTY_BUFFER);
+                    setFinalBuffer(emptyBuffer());
                 }
                 firstpos = currentpos;
                 currentStatus = MultiPartStatus.EPILOGUE;
@@ -606,7 +607,7 @@ public class HttpPostStandardRequestDecoder implements InterfaceHttpPostRequestD
                 if (ampersandpos > firstpos) {
                     setFinalBuffer(undecodedChunk.copy(firstpos, ampersandpos - firstpos));
                 } else if (!currentAttribute.isCompleted()) {
-                    setFinalBuffer(EMPTY_BUFFER);
+                    setFinalBuffer(emptyBuffer());
                 }
                 firstpos = currentpos;
                 currentStatus = MultiPartStatus.EPILOGUE;

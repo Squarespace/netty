@@ -367,7 +367,7 @@ public class DefaultHttp2ConnectionEncoder implements Http2ConnectionEncoder {
                     // and it is not end of stream yet. Just complete their promises by writing an empty buffer.
                     ChannelPromise writePromise = ctx.newPromise().addListener(this);
                     queue.remove(0, writePromise).release();
-                    ctx.write(Unpooled.EMPTY_BUFFER, writePromise);
+                    ctx.write(Unpooled.emptyBuffer(), writePromise);
                     return;
                 }
 

@@ -24,7 +24,11 @@ import java.nio.ByteBuffer;
 import java.nio.channels.GatheringByteChannel;
 import java.nio.channels.ScatteringByteChannel;
 
-import static io.netty.buffer.Unpooled.*;
+import static io.netty.buffer.Unpooled.BIG_ENDIAN;
+import static io.netty.buffer.Unpooled.LITTLE_ENDIAN;
+import static io.netty.buffer.Unpooled.buffer;
+import static io.netty.buffer.Unpooled.emptyBuffer;
+import static io.netty.buffer.Unpooled.unmodifiableBuffer;
 import static org.easymock.EasyMock.*;
 import static org.junit.Assert.*;
 
@@ -122,57 +126,57 @@ public class ReadOnlyByteBufTest {
 
     @Test(expected = UnsupportedOperationException.class)
     public void shouldRejectDiscardReadBytes() {
-        unmodifiableBuffer(EMPTY_BUFFER).discardReadBytes();
+        unmodifiableBuffer(emptyBuffer()).discardReadBytes();
     }
 
     @Test(expected = UnsupportedOperationException.class)
     public void shouldRejectSetByte() {
-        unmodifiableBuffer(EMPTY_BUFFER).setByte(0, (byte) 0);
+        unmodifiableBuffer(emptyBuffer()).setByte(0, (byte) 0);
     }
 
     @Test(expected = UnsupportedOperationException.class)
     public void shouldRejectSetShort() {
-        unmodifiableBuffer(EMPTY_BUFFER).setShort(0, (short) 0);
+        unmodifiableBuffer(emptyBuffer()).setShort(0, (short) 0);
     }
 
     @Test(expected = UnsupportedOperationException.class)
     public void shouldRejectSetMedium() {
-        unmodifiableBuffer(EMPTY_BUFFER).setMedium(0, 0);
+        unmodifiableBuffer(emptyBuffer()).setMedium(0, 0);
     }
 
     @Test(expected = UnsupportedOperationException.class)
     public void shouldRejectSetInt() {
-        unmodifiableBuffer(EMPTY_BUFFER).setInt(0, 0);
+        unmodifiableBuffer(emptyBuffer()).setInt(0, 0);
     }
 
     @Test(expected = UnsupportedOperationException.class)
     public void shouldRejectSetLong() {
-        unmodifiableBuffer(EMPTY_BUFFER).setLong(0, 0);
+        unmodifiableBuffer(emptyBuffer()).setLong(0, 0);
     }
 
     @Test(expected = UnsupportedOperationException.class)
     public void shouldRejectSetBytes1() throws IOException {
-        unmodifiableBuffer(EMPTY_BUFFER).setBytes(0, (InputStream) null, 0);
+        unmodifiableBuffer(emptyBuffer()).setBytes(0, (InputStream) null, 0);
     }
 
     @Test(expected = UnsupportedOperationException.class)
     public void shouldRejectSetBytes2() throws IOException {
-        unmodifiableBuffer(EMPTY_BUFFER).setBytes(0, (ScatteringByteChannel) null, 0);
+        unmodifiableBuffer(emptyBuffer()).setBytes(0, (ScatteringByteChannel) null, 0);
     }
 
     @Test(expected = UnsupportedOperationException.class)
     public void shouldRejectSetBytes3() {
-        unmodifiableBuffer(EMPTY_BUFFER).setBytes(0, (byte[]) null, 0, 0);
+        unmodifiableBuffer(emptyBuffer()).setBytes(0, (byte[]) null, 0, 0);
     }
 
     @Test(expected = UnsupportedOperationException.class)
     public void shouldRejectSetBytes4() {
-        unmodifiableBuffer(EMPTY_BUFFER).setBytes(0, (ByteBuf) null, 0, 0);
+        unmodifiableBuffer(emptyBuffer()).setBytes(0, (ByteBuf) null, 0, 0);
     }
 
     @Test(expected = UnsupportedOperationException.class)
     public void shouldRejectSetBytes5() {
-        unmodifiableBuffer(EMPTY_BUFFER).setBytes(0, (ByteBuffer) null);
+        unmodifiableBuffer(emptyBuffer()).setBytes(0, (ByteBuffer) null);
     }
 
     public void shouldIndicateNotWriteable() {

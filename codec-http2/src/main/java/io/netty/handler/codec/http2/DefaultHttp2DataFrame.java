@@ -42,12 +42,12 @@ public final class DefaultHttp2DataFrame extends AbstractHttp2StreamFrame implem
     }
 
     /**
-     * Equivalent to {@code new DefaultHttp2DataFrame(Unpooled.EMPTY_BUFFER, endStream)}.
+     * Equivalent to {@code new DefaultHttp2DataFrame(Unpooled.emptyBuffer(), endStream)}.
      *
      * @param endStream whether this data should terminate the stream
      */
     public DefaultHttp2DataFrame(boolean endStream) {
-        this(Unpooled.EMPTY_BUFFER, endStream);
+        this(Unpooled.emptyBuffer(), endStream);
     }
 
     /**

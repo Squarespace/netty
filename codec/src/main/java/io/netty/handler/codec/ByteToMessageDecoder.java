@@ -201,7 +201,7 @@ public abstract class ByteToMessageDecoder extends ChannelInboundHandlerAdapter 
         if (cumulation != null) {
             return cumulation;
         } else {
-            return Unpooled.EMPTY_BUFFER;
+            return Unpooled.emptyBuffer();
         }
     }
 
@@ -375,7 +375,7 @@ public abstract class ByteToMessageDecoder extends ChannelInboundHandlerAdapter 
             callDecode(ctx, cumulation, out);
             decodeLast(ctx, cumulation, out);
         } else {
-            decodeLast(ctx, Unpooled.EMPTY_BUFFER, out);
+            decodeLast(ctx, Unpooled.emptyBuffer(), out);
         }
     }
 

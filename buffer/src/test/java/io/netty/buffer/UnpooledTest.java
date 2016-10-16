@@ -30,6 +30,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
 
+import static io.netty.buffer.Unpooled.LITTLE_ENDIAN;
+import static io.netty.buffer.Unpooled.buffer;
+import static io.netty.buffer.Unpooled.copiedBuffer;
+import static io.netty.buffer.Unpooled.emptyBuffer;
+import static io.netty.buffer.Unpooled.unmodifiableBuffer;
+import static io.netty.buffer.Unpooled.wrappedBuffer;
 import static io.netty.buffer.Unpooled.*;
 import static io.netty.util.internal.EmptyArrays.*;
 import static org.junit.Assert.*;
@@ -186,33 +192,33 @@ public class UnpooledTest {
 
     @Test
     public void shouldReturnEmptyBufferWhenLengthIsZero() {
-        assertSame(EMPTY_BUFFER, wrappedBuffer(EMPTY_BYTES));
-        assertSame(EMPTY_BUFFER, wrappedBuffer(new byte[8], 0, 0));
-        assertSame(EMPTY_BUFFER, wrappedBuffer(new byte[8], 8, 0));
-        assertSame(EMPTY_BUFFER, wrappedBuffer(ByteBuffer.allocateDirect(0)));
-        assertSame(EMPTY_BUFFER, wrappedBuffer(EMPTY_BUFFER));
-        assertSame(EMPTY_BUFFER, wrappedBuffer(EMPTY_BYTES_2D));
-        assertSame(EMPTY_BUFFER, wrappedBuffer(new byte[][] { EMPTY_BYTES }));
-        assertSame(EMPTY_BUFFER, wrappedBuffer(EMPTY_BYTE_BUFFERS));
-        assertSame(EMPTY_BUFFER, wrappedBuffer(new ByteBuffer[] { ByteBuffer.allocate(0) }));
-        assertSame(EMPTY_BUFFER, wrappedBuffer(ByteBuffer.allocate(0), ByteBuffer.allocate(0)));
-        assertSame(EMPTY_BUFFER, wrappedBuffer(EMPTY_BYTE_BUFS));
-        assertSame(EMPTY_BUFFER, wrappedBuffer(new ByteBuf[] { buffer(0) }));
-        assertSame(EMPTY_BUFFER, wrappedBuffer(buffer(0), buffer(0)));
+        assertSame(emptyBuffer(), wrappedBuffer(EMPTY_BYTES));
+        assertSame(emptyBuffer(), wrappedBuffer(new byte[8], 0, 0));
+        assertSame(emptyBuffer(), wrappedBuffer(new byte[8], 8, 0));
+        assertSame(emptyBuffer(), wrappedBuffer(ByteBuffer.allocateDirect(0)));
+        assertSame(emptyBuffer(), wrappedBuffer(emptyBuffer()));
+        assertSame(emptyBuffer(), wrappedBuffer(EMPTY_BYTES_2D));
+        assertSame(emptyBuffer(), wrappedBuffer(new byte[][] { EMPTY_BYTES }));
+        assertSame(emptyBuffer(), wrappedBuffer(EMPTY_BYTE_BUFFERS));
+        assertSame(emptyBuffer(), wrappedBuffer(new ByteBuffer[] { ByteBuffer.allocate(0) }));
+        assertSame(emptyBuffer(), wrappedBuffer(ByteBuffer.allocate(0), ByteBuffer.allocate(0)));
+        assertSame(emptyBuffer(), wrappedBuffer(EMPTY_BYTE_BUFS));
+        assertSame(emptyBuffer(), wrappedBuffer(new ByteBuf[] { buffer(0) }));
+        assertSame(emptyBuffer(), wrappedBuffer(buffer(0), buffer(0)));
 
-        assertSame(EMPTY_BUFFER, copiedBuffer(EMPTY_BYTES));
-        assertSame(EMPTY_BUFFER, copiedBuffer(new byte[8], 0, 0));
-        assertSame(EMPTY_BUFFER, copiedBuffer(new byte[8], 8, 0));
-        assertSame(EMPTY_BUFFER, copiedBuffer(ByteBuffer.allocateDirect(0)));
-        assertSame(EMPTY_BUFFER, copiedBuffer(EMPTY_BUFFER));
-        assertSame(EMPTY_BUFFER, copiedBuffer(EMPTY_BYTES_2D));
-        assertSame(EMPTY_BUFFER, copiedBuffer(new byte[][] { EMPTY_BYTES }));
-        assertSame(EMPTY_BUFFER, copiedBuffer(EMPTY_BYTE_BUFFERS));
-        assertSame(EMPTY_BUFFER, copiedBuffer(new ByteBuffer[] { ByteBuffer.allocate(0) }));
-        assertSame(EMPTY_BUFFER, copiedBuffer(ByteBuffer.allocate(0), ByteBuffer.allocate(0)));
-        assertSame(EMPTY_BUFFER, copiedBuffer(EMPTY_BYTE_BUFS));
-        assertSame(EMPTY_BUFFER, copiedBuffer(new ByteBuf[] { buffer(0) }));
-        assertSame(EMPTY_BUFFER, copiedBuffer(buffer(0), buffer(0)));
+        assertSame(emptyBuffer(), copiedBuffer(EMPTY_BYTES));
+        assertSame(emptyBuffer(), copiedBuffer(new byte[8], 0, 0));
+        assertSame(emptyBuffer(), copiedBuffer(new byte[8], 8, 0));
+        assertSame(emptyBuffer(), copiedBuffer(ByteBuffer.allocateDirect(0)));
+        assertSame(emptyBuffer(), copiedBuffer(emptyBuffer()));
+        assertSame(emptyBuffer(), copiedBuffer(EMPTY_BYTES_2D));
+        assertSame(emptyBuffer(), copiedBuffer(new byte[][] { EMPTY_BYTES }));
+        assertSame(emptyBuffer(), copiedBuffer(EMPTY_BYTE_BUFFERS));
+        assertSame(emptyBuffer(), copiedBuffer(new ByteBuffer[] { ByteBuffer.allocate(0) }));
+        assertSame(emptyBuffer(), copiedBuffer(ByteBuffer.allocate(0), ByteBuffer.allocate(0)));
+        assertSame(emptyBuffer(), copiedBuffer(EMPTY_BYTE_BUFS));
+        assertSame(emptyBuffer(), copiedBuffer(new ByteBuf[] { buffer(0) }));
+        assertSame(emptyBuffer(), copiedBuffer(buffer(0), buffer(0)));
     }
 
     @Test
@@ -231,9 +237,9 @@ public class UnpooledTest {
     @Test
     public void shouldAllowEmptyBufferToCreateCompositeBuffer() {
         ByteBuf buf = wrappedBuffer(
-                EMPTY_BUFFER,
+                emptyBuffer(),
                 wrappedBuffer(new byte[16]).order(LITTLE_ENDIAN),
-                EMPTY_BUFFER);
+                emptyBuffer());
         try {
             assertEquals(16, buf.capacity());
         } finally {
@@ -295,7 +301,7 @@ public class UnpooledTest {
     public void testSingleUnReadableWrappedByteBufReleased() {
         ByteBuf buf = buffer(12);
         ByteBuf wrapped = wrappedBuffer(buf);
-        assertFalse(wrapped.release()); // EMPTY_BUFFER cannot be released
+        assertFalse(wrapped.release()); // emptyBuffer() cannot be released
         assertEquals(0, buf.refCnt());
     }
 
@@ -314,7 +320,7 @@ public class UnpooledTest {
         ByteBuf buf1 = buffer(12);
         ByteBuf buf2 = buffer(12);
         ByteBuf wrapped = wrappedBuffer(16, buf1, buf2);
-        assertFalse(wrapped.release()); // EMPTY_BUFFER cannot be released
+        assertFalse(wrapped.release()); // emptyBuffer() cannot be released
         assertEquals(0, buf1.refCnt());
         assertEquals(0, buf2.refCnt());
     }
@@ -363,7 +369,7 @@ public class UnpooledTest {
 
     @Test
     public void testHexDump() {
-        assertEquals("", ByteBufUtil.hexDump(EMPTY_BUFFER));
+        assertEquals("", ByteBufUtil.hexDump(emptyBuffer()));
 
         assertEquals("123456", ByteBufUtil.hexDump(wrappedBuffer(
                 new byte[]{
@@ -402,7 +408,7 @@ public class UnpooledTest {
         }
 
         try {
-            buf.setBytes(0, EMPTY_BUFFER, 0, 0);
+            buf.setBytes(0, emptyBuffer(), 0, 0);
             fail();
         } catch (UnsupportedOperationException e) {
             // Expected

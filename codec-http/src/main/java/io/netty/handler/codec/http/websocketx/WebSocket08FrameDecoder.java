@@ -417,7 +417,7 @@ public class WebSocket08FrameDecoder extends ByteToMessageDecoder
         if (ctx.channel().isActive()) {
             Object closeMessage;
             if (receivedClosingHandshake) {
-                closeMessage = Unpooled.EMPTY_BUFFER;
+                closeMessage = Unpooled.emptyBuffer();
             } else {
                 closeMessage = new CloseWebSocketFrame(1002, null);
             }

@@ -34,7 +34,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static io.netty.buffer.ByteBufUtil.hexDump;
-import static io.netty.buffer.Unpooled.EMPTY_BUFFER;
+import static io.netty.buffer.Unpooled.emptyBuffer;
 import static io.netty.handler.codec.http2.Http2CodecUtil.HTTP_UPGRADE_STREAM_ID;
 import static io.netty.handler.codec.http2.Http2CodecUtil.connectionPrefaceBuf;
 import static io.netty.handler.codec.http2.Http2CodecUtil.getEmbeddedHttp2Exception;
@@ -425,7 +425,7 @@ public class Http2ConnectionHandler extends ByteToMessageDecoder implements Http
         // a GO_AWAY has been sent we send a empty buffer just so we can wait to close until all other data has been
         // flushed to the OS.
         // https://github.com/netty/netty/issues/5307
-        final ChannelFuture future = connection().goAwaySent() ? ctx.write(EMPTY_BUFFER) : goAway(ctx, null);
+        final ChannelFuture future = connection().goAwaySent() ? ctx.write(emptyBuffer()) : goAway(ctx, null);
         ctx.flush();
         doGracefulShutdown(ctx, future, promise);
     }

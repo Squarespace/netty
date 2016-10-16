@@ -28,7 +28,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
 
-import static io.netty.buffer.Unpooled.EMPTY_BUFFER;
+import static io.netty.buffer.Unpooled.emptyBuffer;
 import static io.netty.buffer.Unpooled.buffer;
 import static io.netty.buffer.Unpooled.compositeBuffer;
 import static io.netty.buffer.Unpooled.wrappedBuffer;
@@ -162,7 +162,7 @@ public abstract class AbstractMemoryHttpData extends AbstractHttpData {
     @Override
     public byte[] get() {
         if (byteBuf == null) {
-            return EMPTY_BUFFER.array();
+            return emptyBuffer().array();
         }
         byte[] array = new byte[byteBuf.readableBytes()];
         byteBuf.getBytes(byteBuf.readerIndex(), array);
@@ -199,12 +199,12 @@ public abstract class AbstractMemoryHttpData extends AbstractHttpData {
     public ByteBuf getChunk(int length) throws IOException {
         if (byteBuf == null || length == 0 || byteBuf.readableBytes() == 0) {
             chunkPosition = 0;
-            return EMPTY_BUFFER;
+            return emptyBuffer();
         }
         int sizeLeft = byteBuf.readableBytes() - chunkPosition;
         if (sizeLeft == 0) {
             chunkPosition = 0;
-            return EMPTY_BUFFER;
+            return emptyBuffer();
         }
         int sliceLength = length;
         if (sizeLeft < length) {

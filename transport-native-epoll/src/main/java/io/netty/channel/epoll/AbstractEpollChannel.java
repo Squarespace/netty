@@ -213,7 +213,7 @@ abstract class AbstractEpollChannel extends AbstractChannel implements UnixChann
         final int readableBytes = buf.readableBytes();
         if (readableBytes == 0) {
             ReferenceCountUtil.safeRelease(holder);
-            return Unpooled.EMPTY_BUFFER;
+            return Unpooled.emptyBuffer();
         }
 
         final ByteBufAllocator alloc = alloc();

@@ -822,7 +822,7 @@ public abstract class AbstractByteBuf extends ByteBuf {
     public ByteBuf readBytes(int length) {
         checkReadableBytes(length);
         if (length == 0) {
-            return Unpooled.EMPTY_BUFFER;
+            return Unpooled.emptyBuffer();
         }
 
         ByteBuf buf = alloc().buffer(length, maxCapacity);

@@ -252,7 +252,7 @@ public class ChunkedWriteHandler extends ChannelDuplexHandler {
                 if (message == null) {
                     // If message is null write an empty ByteBuf.
                     // See https://github.com/netty/netty/issues/1671
-                    message = Unpooled.EMPTY_BUFFER;
+                    message = Unpooled.emptyBuffer();
                 }
 
                 ChannelFuture f = ctx.write(message);

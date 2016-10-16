@@ -204,7 +204,7 @@ public class Http2ServerDowngraderTest {
     @Test
     public void testUpgradeTrailers() throws Exception {
         EmbeddedChannel ch = new EmbeddedChannel(new Http2ServerDowngrader());
-        LastHttpContent trailers = new DefaultLastHttpContent(Unpooled.EMPTY_BUFFER, true);
+        LastHttpContent trailers = new DefaultLastHttpContent(Unpooled.emptyBuffer(), true);
         HttpHeaders headers = trailers.trailingHeaders();
         headers.set("key", "value");
         assertTrue(ch.writeOutbound(trailers));

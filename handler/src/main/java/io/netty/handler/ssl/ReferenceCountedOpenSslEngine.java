@@ -167,7 +167,7 @@ public class ReferenceCountedOpenSslEngine extends SSLEngine implements Referenc
 
     private static final String INVALID_CIPHER = "SSL_NULL_WITH_NULL_NULL";
 
-    private static final long EMPTY_ADDR = Buffer.address(Unpooled.EMPTY_BUFFER.nioBuffer());
+    private static final long EMPTY_ADDR = Buffer.address(Unpooled.emptyBuffer().nioBuffer());
 
     private static final SSLEngineResult NEED_UNWRAP_OK = new SSLEngineResult(OK, NEED_UNWRAP, 0, 0);
     private static final SSLEngineResult NEED_UNWRAP_CLOSED = new SSLEngineResult(CLOSED, NEED_UNWRAP, 0, 0);

@@ -32,7 +32,7 @@ public class DefaultByteBufHolderTest {
 
     @Test
     public void testEqualsAndHashCode() {
-        ByteBufHolder holder = new DefaultByteBufHolder(Unpooled.EMPTY_BUFFER);
+        ByteBufHolder holder = new DefaultByteBufHolder(Unpooled.emptyBuffer());
         ByteBufHolder copy = holder.copy();
         try {
             assertEquals(holder, copy);

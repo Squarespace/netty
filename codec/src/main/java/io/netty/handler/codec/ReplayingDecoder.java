@@ -329,7 +329,7 @@ public abstract class ReplayingDecoder<S> extends ByteToMessageDecoder {
                 callDecode(ctx, internalBuffer(), out);
                 decodeLast(ctx, replayable, out);
             } else {
-                replayable.setCumulation(Unpooled.EMPTY_BUFFER);
+                replayable.setCumulation(Unpooled.emptyBuffer());
                 decodeLast(ctx, replayable, out);
             }
         } catch (Signal replay) {

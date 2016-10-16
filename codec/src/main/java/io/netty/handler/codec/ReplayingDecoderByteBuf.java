@@ -43,7 +43,7 @@ final class ReplayingDecoderByteBuf extends ByteBuf {
     private boolean terminated;
     private SwappedByteBuf swapped;
 
-    static final ReplayingDecoderByteBuf EMPTY_BUFFER = new ReplayingDecoderByteBuf(Unpooled.EMPTY_BUFFER);
+    static final ReplayingDecoderByteBuf EMPTY_BUFFER = new ReplayingDecoderByteBuf(Unpooled.emptyBuffer());
 
     static {
         EMPTY_BUFFER.terminate();

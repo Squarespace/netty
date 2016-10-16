@@ -14,7 +14,7 @@
  */
 package io.netty.handler.codec.http2;
 
-import static io.netty.buffer.Unpooled.EMPTY_BUFFER;
+import static io.netty.buffer.Unpooled.emptyBuffer;
 import static io.netty.buffer.Unpooled.wrappedBuffer;
 import static io.netty.handler.codec.http2.Http2CodecUtil.DEFAULT_PRIORITY_WEIGHT;
 import static io.netty.handler.codec.http2.Http2CodecUtil.emptyPingBuf;
@@ -538,7 +538,7 @@ public class DefaultHttp2ConnectionEncoderTest {
     @Test
     public void canWriteDataFrameAfterGoAwaySent() throws Exception {
         Http2Stream stream = createStream(STREAM_ID, false);
-        connection.goAwaySent(0, 0, EMPTY_BUFFER);
+        connection.goAwaySent(0, 0, emptyBuffer());
         ByteBuf data = mock(ByteBuf.class);
         encoder.writeData(ctx, STREAM_ID, data, 0, false, newPromise());
         verify(remoteFlow).addFlowControlled(eq(stream), any(FlowControlled.class));
@@ -599,11 +599,11 @@ public class DefaultHttp2ConnectionEncoderTest {
     }
 
     private void goAwayReceived(int lastStreamId) {
-        connection.goAwayReceived(lastStreamId, 0, EMPTY_BUFFER);
+        connection.goAwayReceived(lastStreamId, 0, emptyBuffer());
     }
 
     private void goAwaySent(int lastStreamId) {
-        connection.goAwaySent(lastStreamId, 0, EMPTY_BUFFER);
+        connection.goAwaySent(lastStreamId, 0, emptyBuffer());
     }
 
     private ChannelPromise newPromise() {

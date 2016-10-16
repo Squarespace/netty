@@ -85,7 +85,7 @@ public class Utf8FrameValidator extends ChannelInboundHandlerAdapter {
             utf8Validator.check(buffer);
         } catch (CorruptedFrameException ex) {
             if (ctx.channel().isActive()) {
-                ctx.writeAndFlush(Unpooled.EMPTY_BUFFER).addListener(ChannelFutureListener.CLOSE);
+                ctx.writeAndFlush(Unpooled.emptyBuffer()).addListener(ChannelFutureListener.CLOSE);
             }
         }
     }

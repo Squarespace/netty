@@ -93,6 +93,10 @@ public abstract class AbstractByteBufAllocator implements ByteBufAllocator {
         emptyBuf = new EmptyByteBuf(this);
     }
 
+    private ByteBuf emptyBuffer() {
+      return ByteBufUtil.EMPTY_SINGLETON ? emptyBuf : new EmptyByteBuf(this);
+    }
+
     @Override
     public ByteBuf buffer() {
         if (directByDefault) {
@@ -154,7 +158,7 @@ public abstract class AbstractByteBufAllocator implements ByteBufAllocator {
     @Override
     public ByteBuf heapBuffer(int initialCapacity, int maxCapacity) {
         if (initialCapacity == 0 && maxCapacity == 0) {
-            return emptyBuf;
+            return emptyBuffer();
         }
         validate(initialCapacity, maxCapacity);
         return newHeapBuffer(initialCapacity, maxCapacity);
@@ -173,7 +177,7 @@ public abstract class AbstractByteBufAllocator implements ByteBufAllocator {
     @Override
     public ByteBuf directBuffer(int initialCapacity, int maxCapacity) {
         if (initialCapacity == 0 && maxCapacity == 0) {
-            return emptyBuf;
+            return emptyBuffer();
         }
         validate(initialCapacity, maxCapacity);
         return newDirectBuffer(initialCapacity, maxCapacity);

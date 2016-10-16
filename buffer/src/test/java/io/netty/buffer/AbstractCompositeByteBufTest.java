@@ -27,7 +27,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import static io.netty.buffer.Unpooled.*;
+import static io.netty.buffer.Unpooled.buffer;
+import static io.netty.buffer.Unpooled.compositeBuffer;
+import static io.netty.buffer.Unpooled.directBuffer;
+import static io.netty.buffer.Unpooled.emptyBuffer;
+import static io.netty.buffer.Unpooled.wrappedBuffer;
 import static io.netty.util.ReferenceCountUtil.*;
 import static io.netty.util.internal.EmptyArrays.*;
 import static org.hamcrest.CoreMatchers.*;
@@ -51,25 +55,25 @@ public abstract class AbstractCompositeByteBufTest extends AbstractByteBufTest {
     protected ByteBuf newBuffer(int length) {
         List<ByteBuf> buffers = new ArrayList<ByteBuf>();
         for (int i = 0; i < length + 45; i += 45) {
-            buffers.add(EMPTY_BUFFER);
+            buffers.add(emptyBuffer());
             buffers.add(wrappedBuffer(new byte[1]));
-            buffers.add(EMPTY_BUFFER);
+            buffers.add(emptyBuffer());
             buffers.add(wrappedBuffer(new byte[2]));
-            buffers.add(EMPTY_BUFFER);
+            buffers.add(emptyBuffer());
             buffers.add(wrappedBuffer(new byte[3]));
-            buffers.add(EMPTY_BUFFER);
+            buffers.add(emptyBuffer());
             buffers.add(wrappedBuffer(new byte[4]));
-            buffers.add(EMPTY_BUFFER);
+            buffers.add(emptyBuffer());
             buffers.add(wrappedBuffer(new byte[5]));
-            buffers.add(EMPTY_BUFFER);
+            buffers.add(emptyBuffer());
             buffers.add(wrappedBuffer(new byte[6]));
-            buffers.add(EMPTY_BUFFER);
+            buffers.add(emptyBuffer());
             buffers.add(wrappedBuffer(new byte[7]));
-            buffers.add(EMPTY_BUFFER);
+            buffers.add(emptyBuffer());
             buffers.add(wrappedBuffer(new byte[8]));
-            buffers.add(EMPTY_BUFFER);
+            buffers.add(emptyBuffer());
             buffers.add(wrappedBuffer(new byte[9]));
-            buffers.add(EMPTY_BUFFER);
+            buffers.add(emptyBuffer());
         }
 
         ByteBuf buffer = wrappedBuffer(Integer.MAX_VALUE, buffers.toArray(new ByteBuf[buffers.size()])).order(order);
@@ -848,7 +852,7 @@ public abstract class AbstractCompositeByteBufTest extends AbstractByteBufTest {
         CompositeByteBuf cbuf = compositeBuffer();
         ByteBuf buf1 = buffer().writeByte((byte) 1);
         cbuf.addComponent(true, buf1);
-        ByteBuf buf2 = EMPTY_BUFFER;
+        ByteBuf buf2 = emptyBuffer();
         cbuf.addComponent(true, buf2);
         ByteBuf buf3 = buffer().writeByte((byte) 2);
         cbuf.addComponent(true, buf3);
@@ -857,22 +861,22 @@ public abstract class AbstractCompositeByteBufTest extends AbstractByteBufTest {
         assertEquals((byte) 1, cbuf.readByte());
         assertEquals((byte) 2, cbuf.readByte());
 
-        assertSame(EMPTY_BUFFER, cbuf.internalComponent(1));
-        assertNotSame(EMPTY_BUFFER, cbuf.internalComponentAtOffset(1));
+        assertSame(emptyBuffer(), cbuf.internalComponent(1));
+        assertNotSame(emptyBuffer(), cbuf.internalComponentAtOffset(1));
         cbuf.release();
     }
 
     @Test
     public void testIterator() {
         CompositeByteBuf cbuf = compositeBuffer();
-        cbuf.addComponent(EMPTY_BUFFER);
-        cbuf.addComponent(EMPTY_BUFFER);
+        cbuf.addComponent(emptyBuffer());
+        cbuf.addComponent(emptyBuffer());
 
         Iterator<ByteBuf> it = cbuf.iterator();
         assertTrue(it.hasNext());
-        assertSame(EMPTY_BUFFER, it.next());
+        assertSame(emptyBuffer(), it.next());
         assertTrue(it.hasNext());
-        assertSame(EMPTY_BUFFER, it.next());
+        assertSame(emptyBuffer(), it.next());
         assertFalse(it.hasNext());
 
         try {
@@ -903,10 +907,10 @@ public abstract class AbstractCompositeByteBufTest extends AbstractByteBufTest {
     @Test(expected = ConcurrentModificationException.class)
     public void testIteratorConcurrentModificationAdd() {
         CompositeByteBuf cbuf = compositeBuffer();
-        cbuf.addComponent(EMPTY_BUFFER);
+        cbuf.addComponent(emptyBuffer());
 
         Iterator<ByteBuf> it = cbuf.iterator();
-        cbuf.addComponent(EMPTY_BUFFER);
+        cbuf.addComponent(emptyBuffer());
 
         assertTrue(it.hasNext());
         try {
@@ -919,7 +923,7 @@ public abstract class AbstractCompositeByteBufTest extends AbstractByteBufTest {
     @Test(expected = ConcurrentModificationException.class)
     public void testIteratorConcurrentModificationRemove() {
         CompositeByteBuf cbuf = compositeBuffer();
-        cbuf.addComponent(EMPTY_BUFFER);
+        cbuf.addComponent(emptyBuffer());
 
         Iterator<ByteBuf> it = cbuf.iterator();
         cbuf.removeComponent(0);

@@ -86,11 +86,11 @@ public class HttpObjectAggregator
         extends MessageAggregator<HttpObject, HttpMessage, HttpContent, FullHttpMessage> {
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(HttpObjectAggregator.class);
     private static final FullHttpResponse CONTINUE =
-            new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.CONTINUE, Unpooled.EMPTY_BUFFER);
+            new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.CONTINUE, Unpooled.emptyBuffer());
     private static final FullHttpResponse EXPECTATION_FAILED = new DefaultFullHttpResponse(
-            HttpVersion.HTTP_1_1, HttpResponseStatus.EXPECTATION_FAILED, Unpooled.EMPTY_BUFFER);
+            HttpVersion.HTTP_1_1, HttpResponseStatus.EXPECTATION_FAILED, Unpooled.emptyBuffer());
     private static final FullHttpResponse TOO_LARGE = new DefaultFullHttpResponse(
-            HttpVersion.HTTP_1_1, HttpResponseStatus.REQUEST_ENTITY_TOO_LARGE, Unpooled.EMPTY_BUFFER);
+            HttpVersion.HTTP_1_1, HttpResponseStatus.REQUEST_ENTITY_TOO_LARGE, Unpooled.emptyBuffer());
 
     static {
         EXPECTATION_FAILED.headers().set(CONTENT_LENGTH, 0);

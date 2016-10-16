@@ -123,7 +123,7 @@ public final class HttpProxyHandler extends ProxyHandler {
         FullHttpRequest req = new DefaultFullHttpRequest(
                 HttpVersion.HTTP_1_1, HttpMethod.CONNECT,
                 host,
-                Unpooled.EMPTY_BUFFER, false);
+                Unpooled.emptyBuffer(), false);
 
         req.headers().set(HttpHeaderNames.HOST, host);
 

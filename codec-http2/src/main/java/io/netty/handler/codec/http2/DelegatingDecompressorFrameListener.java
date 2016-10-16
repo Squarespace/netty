@@ -90,7 +90,7 @@ public class DelegatingDecompressorFrameListener extends Http2FrameListenerDecor
             }
             if (buf == null) {
                 if (endOfStream) {
-                    listener.onDataRead(ctx, streamId, Unpooled.EMPTY_BUFFER, padding, true);
+                    listener.onDataRead(ctx, streamId, Unpooled.emptyBuffer(), padding, true);
                 }
                 // No new decompressed data was extracted from the compressed data. This means the application could
                 // not be provided with data and thus could not return how many bytes were processed. We will assume

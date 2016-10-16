@@ -88,7 +88,7 @@ public class HttpPostRequestDecoderTest {
             final HttpPostRequestDecoder decoder = new HttpPostRequestDecoder(inMemoryFactory, req);
 
             decoder.offer(releaseLater(new DefaultHttpContent(Unpooled.copiedBuffer(body, CharsetUtil.UTF_8))));
-            decoder.offer(releaseLater(new DefaultHttpContent(Unpooled.EMPTY_BUFFER)));
+            decoder.offer(releaseLater(new DefaultHttpContent(Unpooled.emptyBuffer())));
 
             // Validate it's enough chunks to decode upload.
             assertTrue(decoder.hasNext());

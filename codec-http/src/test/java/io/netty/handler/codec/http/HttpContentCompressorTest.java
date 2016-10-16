@@ -259,7 +259,7 @@ public class HttpContentCompressorTest {
         ch.writeInbound(newRequest());
 
         FullHttpResponse res = new DefaultFullHttpResponse(
-                HttpVersion.HTTP_1_1, HttpResponseStatus.OK, Unpooled.EMPTY_BUFFER);
+                HttpVersion.HTTP_1_1, HttpResponseStatus.OK, Unpooled.emptyBuffer());
         ch.writeOutbound(res);
 
         Object o = ch.readOutbound();
@@ -283,7 +283,7 @@ public class HttpContentCompressorTest {
         ch.writeInbound(newRequest());
 
         FullHttpResponse res = new DefaultFullHttpResponse(
-                HttpVersion.HTTP_1_1, HttpResponseStatus.OK, Unpooled.EMPTY_BUFFER);
+                HttpVersion.HTTP_1_1, HttpResponseStatus.OK, Unpooled.emptyBuffer());
         res.trailingHeaders().set(of("X-Test"), of("Netty"));
         ch.writeOutbound(res);
 
@@ -310,12 +310,12 @@ public class HttpContentCompressorTest {
         ch.writeInbound(request);
 
         FullHttpResponse continueResponse = new DefaultFullHttpResponse(
-                HttpVersion.HTTP_1_1, HttpResponseStatus.CONTINUE, Unpooled.EMPTY_BUFFER);
+                HttpVersion.HTTP_1_1, HttpResponseStatus.CONTINUE, Unpooled.emptyBuffer());
 
         ch.writeOutbound(continueResponse);
 
         FullHttpResponse res = new DefaultFullHttpResponse(
-                HttpVersion.HTTP_1_1, HttpResponseStatus.OK, Unpooled.EMPTY_BUFFER);
+                HttpVersion.HTTP_1_1, HttpResponseStatus.OK, Unpooled.emptyBuffer());
         res.trailingHeaders().set(of("X-Test"), of("Netty"));
         ch.writeOutbound(res);
 
@@ -347,11 +347,11 @@ public class HttpContentCompressorTest {
         ch.writeInbound(request);
 
         ch.writeOutbound(new DefaultFullHttpResponse(
-                HttpVersion.HTTP_1_1, HttpResponseStatus.OK, Unpooled.EMPTY_BUFFER));
+                HttpVersion.HTTP_1_1, HttpResponseStatus.OK, Unpooled.emptyBuffer()));
 
         try {
             ch.writeOutbound(new DefaultFullHttpResponse(
-                    HttpVersion.HTTP_1_1, HttpResponseStatus.OK, Unpooled.EMPTY_BUFFER));
+                    HttpVersion.HTTP_1_1, HttpResponseStatus.OK, Unpooled.emptyBuffer()));
             fail();
         } catch (EncoderException e) {
             assertTrue(e.getCause() instanceof IllegalStateException);

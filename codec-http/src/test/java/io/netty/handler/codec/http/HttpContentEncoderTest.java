@@ -218,7 +218,7 @@ public class HttpContentEncoderTest {
         ch.writeInbound(new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/"));
 
         FullHttpResponse res = new DefaultFullHttpResponse(
-                HttpVersion.HTTP_1_1, HttpResponseStatus.OK, Unpooled.EMPTY_BUFFER);
+                HttpVersion.HTTP_1_1, HttpResponseStatus.OK, Unpooled.emptyBuffer());
         ch.writeOutbound(res);
 
         Object o = ch.readOutbound();
@@ -242,7 +242,7 @@ public class HttpContentEncoderTest {
         ch.writeInbound(new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.GET, "/"));
 
         FullHttpResponse res = new DefaultFullHttpResponse(
-                HttpVersion.HTTP_1_1, HttpResponseStatus.OK, Unpooled.EMPTY_BUFFER);
+                HttpVersion.HTTP_1_1, HttpResponseStatus.OK, Unpooled.emptyBuffer());
         res.trailingHeaders().set(of("X-Test"), of("Netty"));
         ch.writeOutbound(res);
 

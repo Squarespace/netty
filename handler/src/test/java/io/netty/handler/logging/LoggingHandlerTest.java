@@ -243,7 +243,7 @@ public class LoggingHandlerTest {
 
     @Test
     public void shouldLogEmptyByteBufDataRead() throws Exception {
-        ByteBuf msg = Unpooled.EMPTY_BUFFER;
+        ByteBuf msg = Unpooled.emptyBuffer();
         appender.doAppend(matchesLog(".+RECEIVED: 0B$"));
         replay(appender);
         EmbeddedChannel channel = new EmbeddedChannel(new LoggingHandler());

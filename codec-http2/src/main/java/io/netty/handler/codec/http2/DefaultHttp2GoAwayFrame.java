@@ -40,12 +40,12 @@ public final class DefaultHttp2GoAwayFrame extends DefaultByteBufHolder implemen
     }
 
     /**
-     * Equivalent to {@code new DefaultHttp2GoAwayFrame(content, Unpooled.EMPTY_BUFFER)}.
+     * Equivalent to {@code new DefaultHttp2GoAwayFrame(content, Unpooled.emptyBuffer())}.
      *
      * @param errorCode reason for the go away
      */
     public DefaultHttp2GoAwayFrame(long errorCode) {
-        this(errorCode, Unpooled.EMPTY_BUFFER);
+        this(errorCode, Unpooled.emptyBuffer());
     }
 
     /**

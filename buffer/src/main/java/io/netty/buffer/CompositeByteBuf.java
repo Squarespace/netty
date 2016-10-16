@@ -43,7 +43,7 @@ import static io.netty.util.internal.ObjectUtil.checkNotNull;
  */
 public class CompositeByteBuf extends AbstractReferenceCountedByteBuf implements Iterable<ByteBuf> {
 
-    private static final ByteBuffer EMPTY_NIO_BUFFER = Unpooled.EMPTY_BUFFER.nioBuffer();
+    private static final ByteBuffer EMPTY_NIO_BUFFER = Unpooled.emptyBuffer().nioBuffer();
     private static final Iterator<ByteBuf> EMPTY_ITERATOR = Collections.<ByteBuf>emptyList().iterator();
 
     private final ByteBufAllocator alloc;
@@ -121,6 +121,10 @@ public class CompositeByteBuf extends AbstractReferenceCountedByteBuf implements
         direct = false;
         maxNumComponents = 0;
         components = Collections.emptyList();
+    }
+
+    private ByteBuffer emptyByteBuffer() {
+      return ByteBufUtil.EMPTY_SINGLETON ? EMPTY_NIO_BUFFER : Unpooled.emptyBuffer().nioBuffer();
     }
 
     /**
@@ -611,7 +615,7 @@ public class CompositeByteBuf extends AbstractReferenceCountedByteBuf implements
     public boolean hasMemoryAddress() {
         switch (components.size()) {
         case 0:
-            return Unpooled.EMPTY_BUFFER.hasMemoryAddress();
+            return Unpooled.emptyBuffer().hasMemoryAddress();
         case 1:
             return components.get(0).buf.hasMemoryAddress();
         default:
@@ -623,7 +627,7 @@ public class CompositeByteBuf extends AbstractReferenceCountedByteBuf implements
     public long memoryAddress() {
         switch (components.size()) {
         case 0:
-            return Unpooled.EMPTY_BUFFER.memoryAddress();
+            return Unpooled.emptyBuffer().memoryAddress();
         case 1:
             return components.get(0).buf.memoryAddress();
         default:
@@ -1241,7 +1245,7 @@ public class CompositeByteBuf extends AbstractReferenceCountedByteBuf implements
     public int setBytes(int index, ScatteringByteChannel in, int length) throws IOException {
         checkIndex(index, length);
         if (length == 0) {
-            return in.read(EMPTY_NIO_BUFFER);
+            return in.read(emptyByteBuffer());
         }
 
         int i = toComponentIndex(index);
@@ -1289,7 +1293,7 @@ public class CompositeByteBuf extends AbstractReferenceCountedByteBuf implements
     public int setBytes(int index, FileChannel in, long position, int length) throws IOException {
         checkIndex(index, length);
         if (length == 0) {
-            return in.read(EMPTY_NIO_BUFFER, position);
+            return in.read(emptyByteBuffer(), position);
         }
 
         int i = toComponentIndex(index);
@@ -1444,7 +1448,7 @@ public class CompositeByteBuf extends AbstractReferenceCountedByteBuf implements
     public ByteBuffer internalNioBuffer(int index, int length) {
         switch (components.size()) {
         case 0:
-            return EMPTY_NIO_BUFFER;
+            return emptyByteBuffer();
         case 1:
             return components.get(0).buf.internalNioBuffer(index, length);
         default:
@@ -1458,7 +1462,7 @@ public class CompositeByteBuf extends AbstractReferenceCountedByteBuf implements
 
         switch (components.size()) {
         case 0:
-            return EMPTY_NIO_BUFFER;
+            return emptyByteBuffer();
         case 1:
             ByteBuf buf = components.get(0).buf;
             if (buf.nioBufferCount() == 1) {
@@ -1481,7 +1485,7 @@ public class CompositeByteBuf extends AbstractReferenceCountedByteBuf implements
     public ByteBuffer[] nioBuffers(int index, int length) {
         checkIndex(index, length);
         if (length == 0) {
-            return new ByteBuffer[] { EMPTY_NIO_BUFFER };
+            return new ByteBuffer[] { emptyByteBuffer() };
         }
 
         List<ByteBuffer> buffers = new ArrayList<ByteBuffer>(components.size());

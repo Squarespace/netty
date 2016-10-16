@@ -27,7 +27,7 @@ import io.netty.util.ReferenceCountUtil;
 
 import java.util.List;
 
-import static io.netty.buffer.Unpooled.EMPTY_BUFFER;
+import static io.netty.buffer.Unpooled.emptyBuffer;
 
 /**
  * An abstract {@link ChannelHandler} that aggregates a series of message objects into a single aggregated message.
@@ -244,7 +244,7 @@ public abstract class MessageAggregator<I, S, C extends ByteBufHolder, O extends
                 if (m instanceof ByteBufHolder && ((ByteBufHolder) m).content().isReadable()) {
                     aggregated = beginAggregation(m, ((ByteBufHolder) m).content().retain());
                 } else {
-                    aggregated = beginAggregation(m, EMPTY_BUFFER);
+                    aggregated = beginAggregation(m, emptyBuffer());
                 }
                 finishAggregation(aggregated);
                 out.add(aggregated);

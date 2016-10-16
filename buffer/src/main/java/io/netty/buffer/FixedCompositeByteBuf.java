@@ -34,7 +34,7 @@ import java.util.Collections;
  * This is useful to write an array of {@link ByteBuf}s.
  */
 final class FixedCompositeByteBuf extends AbstractReferenceCountedByteBuf {
-    private static final ByteBuf[] EMPTY = { Unpooled.EMPTY_BUFFER };
+    private static final ByteBuf[] EMPTY = { Unpooled.emptyBuffer() };
     private final int nioBufferCount;
     private final int capacity;
     private final ByteBufAllocator allocator;
@@ -45,7 +45,7 @@ final class FixedCompositeByteBuf extends AbstractReferenceCountedByteBuf {
     FixedCompositeByteBuf(ByteBufAllocator allocator, ByteBuf... buffers) {
         super(Integer.MAX_VALUE);
         if (buffers.length == 0) {
-            this.buffers = EMPTY;
+            this.buffers = ByteBufUtil.EMPTY_SINGLETON ? EMPTY : new ByteBuf[] { Unpooled.emptyBuffer() };
             order = ByteOrder.BIG_ENDIAN;
             nioBufferCount = 1;
             capacity = 0;

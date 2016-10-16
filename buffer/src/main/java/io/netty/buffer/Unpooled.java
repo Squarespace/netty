@@ -92,6 +92,13 @@ public final class Unpooled {
     }
 
     /**
+     * Returns an empty {@link ByteBuf}.
+     */
+    public static ByteBuf emptyBuffer() {
+      return ByteBufUtil.EMPTY_SINGLETON ? EMPTY_BUFFER : ALLOC.buffer(0, 0);
+    }
+
+    /**
      * Creates a new big-endian Java heap buffer with reasonably small initial capacity, which
      * expands its capacity boundlessly on demand.
      */
@@ -152,7 +159,7 @@ public final class Unpooled {
      */
     public static ByteBuf wrappedBuffer(byte[] array) {
         if (array.length == 0) {
-            return EMPTY_BUFFER;
+            return emptyBuffer();
         }
         return new UnpooledHeapByteBuf(ALLOC, array, array.length);
     }
@@ -164,7 +171,7 @@ public final class Unpooled {
      */
     public static ByteBuf wrappedBuffer(byte[] array, int offset, int length) {
         if (length == 0) {
-            return EMPTY_BUFFER;
+            return emptyBuffer();
         }
 
         if (offset == 0 && length == array.length) {
@@ -181,7 +188,7 @@ public final class Unpooled {
      */
     public static ByteBuf wrappedBuffer(ByteBuffer buffer) {
         if (!buffer.hasRemaining()) {
-            return EMPTY_BUFFER;
+            return emptyBuffer();
         }
         if (!buffer.isDirect() && buffer.hasArray()) {
             return wrappedBuffer(
@@ -228,7 +235,7 @@ public final class Unpooled {
             return buffer.slice();
         } else {
             buffer.release();
-            return EMPTY_BUFFER;
+            return emptyBuffer();
         }
     }
 
@@ -292,7 +299,7 @@ public final class Unpooled {
             }
         }
 
-        return EMPTY_BUFFER;
+        return emptyBuffer();
     }
 
     /**
@@ -326,7 +333,7 @@ public final class Unpooled {
             }
             break;
         }
-        return EMPTY_BUFFER;
+        return emptyBuffer();
     }
 
     /**
@@ -360,7 +367,7 @@ public final class Unpooled {
             }
         }
 
-        return EMPTY_BUFFER;
+        return emptyBuffer();
     }
 
     /**
@@ -384,7 +391,7 @@ public final class Unpooled {
      */
     public static ByteBuf copiedBuffer(byte[] array) {
         if (array.length == 0) {
-            return EMPTY_BUFFER;
+            return emptyBuffer();
         }
         return wrappedBuffer(array.clone());
     }
@@ -397,7 +404,7 @@ public final class Unpooled {
      */
     public static ByteBuf copiedBuffer(byte[] array, int offset, int length) {
         if (length == 0) {
-            return EMPTY_BUFFER;
+            return emptyBuffer();
         }
         byte[] copy = new byte[length];
         System.arraycopy(array, offset, copy, 0, length);
@@ -413,7 +420,7 @@ public final class Unpooled {
     public static ByteBuf copiedBuffer(ByteBuffer buffer) {
         int length = buffer.remaining();
         if (length == 0) {
-            return EMPTY_BUFFER;
+            return emptyBuffer();
         }
         byte[] copy = new byte[length];
         // Duplicate the buffer so we not adjust the position during our get operation.
@@ -436,7 +443,7 @@ public final class Unpooled {
             copy.writeBytes(buffer, buffer.readerIndex(), readable);
             return copy;
         } else {
-            return EMPTY_BUFFER;
+            return emptyBuffer();
         }
     }
 
@@ -449,10 +456,10 @@ public final class Unpooled {
     public static ByteBuf copiedBuffer(byte[]... arrays) {
         switch (arrays.length) {
         case 0:
-            return EMPTY_BUFFER;
+            return emptyBuffer();
         case 1:
             if (arrays[0].length == 0) {
-                return EMPTY_BUFFER;
+                return emptyBuffer();
             } else {
                 return copiedBuffer(arrays[0]);
             }
@@ -469,7 +476,7 @@ public final class Unpooled {
         }
 
         if (length == 0) {
-            return EMPTY_BUFFER;
+            return emptyBuffer();
         }
 
         byte[] mergedArray = new byte[length];
@@ -495,7 +502,7 @@ public final class Unpooled {
     public static ByteBuf copiedBuffer(ByteBuf... buffers) {
         switch (buffers.length) {
         case 0:
-            return EMPTY_BUFFER;
+            return emptyBuffer();
         case 1:
             return copiedBuffer(buffers[0]);
         }
@@ -523,7 +530,7 @@ public final class Unpooled {
         }
 
         if (length == 0) {
-            return EMPTY_BUFFER;
+            return emptyBuffer();
         }
 
         byte[] mergedArray = new byte[length];
@@ -550,7 +557,7 @@ public final class Unpooled {
     public static ByteBuf copiedBuffer(ByteBuffer... buffers) {
         switch (buffers.length) {
         case 0:
-            return EMPTY_BUFFER;
+            return emptyBuffer();
         case 1:
             return copiedBuffer(buffers[0]);
         }
@@ -578,7 +585,7 @@ public final class Unpooled {
         }
 
         if (length == 0) {
-            return EMPTY_BUFFER;
+            return emptyBuffer();
         }
 
         byte[] mergedArray = new byte[length];
@@ -624,7 +631,7 @@ public final class Unpooled {
             throw new NullPointerException("string");
         }
         if (length == 0) {
-            return EMPTY_BUFFER;
+            return emptyBuffer();
         }
 
         if (string instanceof CharBuffer) {
@@ -669,7 +676,7 @@ public final class Unpooled {
             throw new NullPointerException("array");
         }
         if (length == 0) {
-            return EMPTY_BUFFER;
+            return emptyBuffer();
         }
         return copiedBuffer(CharBuffer.wrap(array, offset, length), charset);
     }
@@ -710,7 +717,7 @@ public final class Unpooled {
      */
     public static ByteBuf copyInt(int... values) {
         if (values == null || values.length == 0) {
-            return EMPTY_BUFFER;
+            return emptyBuffer();
         }
         ByteBuf buffer = buffer(values.length * 4);
         for (int v: values) {
@@ -733,7 +740,7 @@ public final class Unpooled {
      */
     public static ByteBuf copyShort(short... values) {
         if (values == null || values.length == 0) {
-            return EMPTY_BUFFER;
+            return emptyBuffer();
         }
         ByteBuf buffer = buffer(values.length * 2);
         for (int v: values) {
@@ -747,7 +754,7 @@ public final class Unpooled {
      */
     public static ByteBuf copyShort(int... values) {
         if (values == null || values.length == 0) {
-            return EMPTY_BUFFER;
+            return emptyBuffer();
         }
         ByteBuf buffer = buffer(values.length * 2);
         for (int v: values) {
@@ -770,7 +777,7 @@ public final class Unpooled {
      */
     public static ByteBuf copyMedium(int... values) {
         if (values == null || values.length == 0) {
-            return EMPTY_BUFFER;
+            return emptyBuffer();
         }
         ByteBuf buffer = buffer(values.length * 3);
         for (int v: values) {
@@ -793,7 +800,7 @@ public final class Unpooled {
      */
     public static ByteBuf copyLong(long... values) {
         if (values == null || values.length == 0) {
-            return EMPTY_BUFFER;
+            return emptyBuffer();
         }
         ByteBuf buffer = buffer(values.length * 8);
         for (long v: values) {
@@ -816,7 +823,7 @@ public final class Unpooled {
      */
     public static ByteBuf copyBoolean(boolean... values) {
         if (values == null || values.length == 0) {
-            return EMPTY_BUFFER;
+            return emptyBuffer();
         }
         ByteBuf buffer = buffer(values.length);
         for (boolean v: values) {
@@ -839,7 +846,7 @@ public final class Unpooled {
      */
     public static ByteBuf copyFloat(float... values) {
         if (values == null || values.length == 0) {
-            return EMPTY_BUFFER;
+            return emptyBuffer();
         }
         ByteBuf buffer = buffer(values.length * 4);
         for (float v: values) {
@@ -862,7 +869,7 @@ public final class Unpooled {
      */
     public static ByteBuf copyDouble(double... values) {
         if (values == null || values.length == 0) {
-            return EMPTY_BUFFER;
+            return emptyBuffer();
         }
         ByteBuf buffer = buffer(values.length * 8);
         for (double v: values) {

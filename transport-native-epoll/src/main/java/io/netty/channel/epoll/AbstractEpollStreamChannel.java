@@ -1272,7 +1272,7 @@ public abstract class AbstractEpollStreamChannel extends AbstractEpollChannel im
                 ByteBuf buffer = null;
                 try {
                     if (readableBytes == 0) {
-                        buffer = Unpooled.EMPTY_BUFFER;
+                        buffer = Unpooled.emptyBuffer();
                     } else {
                         final ByteBufAllocator alloc = alloc();
                         if (alloc.isDirectBufferPooled()) {

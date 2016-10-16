@@ -481,7 +481,7 @@ public class SslHandler extends ByteToMessageDecoder implements ChannelOutboundH
             // may want to add a ChannelFutureListener to the ChannelPromise later.
             //
             // See https://github.com/netty/netty/issues/3364
-            pendingUnencryptedWrites.add(Unpooled.EMPTY_BUFFER, ctx.newPromise());
+            pendingUnencryptedWrites.add(Unpooled.emptyBuffer(), ctx.newPromise());
         }
         if (!handshakePromise.isDone()) {
             flushedBeforeHandshake = true;
@@ -568,10 +568,10 @@ public class SslHandler extends ByteToMessageDecoder implements ChannelOutboundH
     private void finishWrap(ChannelHandlerContext ctx, ByteBuf out, ChannelPromise promise, boolean inUnwrap,
             boolean needUnwrap) {
         if (out == null) {
-            out = Unpooled.EMPTY_BUFFER;
+            out = Unpooled.emptyBuffer();
         } else if (!out.isReadable()) {
             out.release();
-            out = Unpooled.EMPTY_BUFFER;
+            out = Unpooled.emptyBuffer();
         }
 
         if (promise != null) {
@@ -601,7 +601,7 @@ public class SslHandler extends ByteToMessageDecoder implements ChannelOutboundH
                 if (out == null) {
                     out = allocateOutNetBuf(ctx, 0);
                 }
-                SSLEngineResult result = wrap(alloc, engine, Unpooled.EMPTY_BUFFER, out);
+                SSLEngineResult result = wrap(alloc, engine, Unpooled.emptyBuffer(), out);
 
                 if (result.bytesProduced() > 0) {
                     ctx.write(out);
@@ -948,7 +948,7 @@ public class SslHandler extends ByteToMessageDecoder implements ChannelOutboundH
      * Calls {@link SSLEngine#unwrap(ByteBuffer, ByteBuffer)} with an empty buffer to handle handshakes, etc.
      */
     private void unwrapNonAppData(ChannelHandlerContext ctx) throws SSLException {
-        unwrap(ctx, Unpooled.EMPTY_BUFFER, 0, 0);
+        unwrap(ctx, Unpooled.emptyBuffer(), 0, 0);
     }
 
     /**
@@ -1263,7 +1263,7 @@ public class SslHandler extends ByteToMessageDecoder implements ChannelOutboundH
     }
 
     private void flush(ChannelHandlerContext ctx, ChannelPromise promise) throws Exception {
-        pendingUnencryptedWrites.add(Unpooled.EMPTY_BUFFER, promise);
+        pendingUnencryptedWrites.add(Unpooled.emptyBuffer(), promise);
         flush(ctx);
     }
 
