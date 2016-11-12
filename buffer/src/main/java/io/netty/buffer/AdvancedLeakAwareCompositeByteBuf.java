@@ -40,17 +40,17 @@ final class AdvancedLeakAwareCompositeByteBuf extends WrappedCompositeByteBuf {
     private static final InternalLogger logger = InternalLoggerFactory.getInstance(AdvancedLeakAwareCompositeByteBuf.class);
     
     private final ResourceLeak leak;
-    private final Exception tracking;
+    private final Caller caller;
     
     AdvancedLeakAwareCompositeByteBuf(CompositeByteBuf wrapped, ResourceLeak leak) {
         this(wrapped, leak, null);
     }
     
-    AdvancedLeakAwareCompositeByteBuf(CompositeByteBuf wrapped, ResourceLeak leak, Exception parent) {
+    AdvancedLeakAwareCompositeByteBuf(CompositeByteBuf wrapped, ResourceLeak leak, Caller parent) {
         super(wrapped);
         this.leak = leak;
         
-        tracking = new RuntimeException("AdvancedLeakAwareCompositeByteBuf(): buf=" + wrapped + ", hashCode=" + System.identityHashCode(this), parent);
+        caller = new Caller("AdvancedLeakAwareCompositeByteBuf(): buf=" + wrapped + ", hashCode=" + System.identityHashCode(this), parent);
     }
 
     @Override
@@ -59,62 +59,62 @@ final class AdvancedLeakAwareCompositeByteBuf extends WrappedCompositeByteBuf {
         if (order() == endianness) {
             return this;
         } else {
-            return new AdvancedLeakAwareByteBuf(super.order(endianness), leak, tracking);
+            return new AdvancedLeakAwareByteBuf(super.order(endianness), leak, caller, this);
         }
     }
 
     @Override
     public ByteBuf slice() {
         recordLeakNonRefCountingOperation(leak);
-        return new AdvancedLeakAwareByteBuf(super.slice(), leak, tracking);
+        return new AdvancedLeakAwareByteBuf(super.slice(), leak, caller, this);
     }
 
     @Override
     public ByteBuf retainedSlice() {
         recordLeakNonRefCountingOperation(leak);
-        return new AdvancedLeakAwareByteBuf(super.retainedSlice(), leak, tracking);
+        return new AdvancedLeakAwareByteBuf(super.retainedSlice(), leak, caller, this);
     }
 
     @Override
     public ByteBuf slice(int index, int length) {
         recordLeakNonRefCountingOperation(leak);
-        return new AdvancedLeakAwareByteBuf(super.slice(index, length), leak, tracking);
+        return new AdvancedLeakAwareByteBuf(super.slice(index, length), leak, caller, this);
     }
 
     @Override
     public ByteBuf retainedSlice(int index, int length) {
         recordLeakNonRefCountingOperation(leak);
-        return new AdvancedLeakAwareByteBuf(super.retainedSlice(index, length), leak, tracking);
+        return new AdvancedLeakAwareByteBuf(super.retainedSlice(index, length), leak, caller, this);
     }
 
     @Override
     public ByteBuf duplicate() {
         recordLeakNonRefCountingOperation(leak);
-        return new AdvancedLeakAwareByteBuf(super.duplicate(), leak, tracking);
+        return new AdvancedLeakAwareByteBuf(super.duplicate(), leak, caller, this);
     }
 
     @Override
     public ByteBuf retainedDuplicate() {
         recordLeakNonRefCountingOperation(leak);
-        return new AdvancedLeakAwareByteBuf(super.retainedDuplicate(), leak, tracking);
+        return new AdvancedLeakAwareByteBuf(super.retainedDuplicate(), leak, caller, this);
     }
 
     @Override
     public ByteBuf readSlice(int length) {
         recordLeakNonRefCountingOperation(leak);
-        return new AdvancedLeakAwareByteBuf(super.readSlice(length), leak, tracking);
+        return new AdvancedLeakAwareByteBuf(super.readSlice(length), leak, caller, this);
     }
 
     @Override
     public ByteBuf readRetainedSlice(int length) {
         recordLeakNonRefCountingOperation(leak);
-        return new AdvancedLeakAwareByteBuf(super.readRetainedSlice(length), leak, tracking);
+        return new AdvancedLeakAwareByteBuf(super.readRetainedSlice(length), leak, caller, this);
     }
 
     @Override
     public ByteBuf asReadOnly() {
         recordLeakNonRefCountingOperation(leak);
-        return new AdvancedLeakAwareByteBuf(super.asReadOnly(), leak, tracking);
+        return new AdvancedLeakAwareByteBuf(super.asReadOnly(), leak, caller, this);
     }
 
     @Override
@@ -1050,19 +1050,28 @@ final class AdvancedLeakAwareCompositeByteBuf extends WrappedCompositeByteBuf {
     @Override
     public boolean release() {
         
-        tracking.addSuppressed(new RuntimeException("release(): buf=" + unwrap() + ", refCnt=" + refCnt() + ", hashCode=" + System.identityHashCode(this)));
+        Caller element = new Caller("release(): buf=" + unwrap() + ", refCnt=" + refCnt() + ", hashCode=" + System.identityHashCode(this));
+        caller.add(element);
         
         try {
             boolean deallocated = super.release();
+            
+            element.after("refCnt=" + refCnt() + ", deallocated=" + deallocated);
+            
             if (deallocated) {
+                
+                if (unwrap() instanceof PooledByteBuf) {
+                    logger.error("DEALLOCATE: timeStamp=" + Caller.timeStamp() + ", buf=" + unwrap() + ", hashCode=" + System.identityHashCode(this));
+                }
+                
                 leak.close();
             } else {
                 leak.record();
             }
             return deallocated;
         } catch (Throwable err) {
-            tracking.addSuppressed(err);
-            logger.error("IllegalStateException", tracking);
+            caller.add(new Caller(err.getMessage()));
+            logger.error("EXCEPTION:\n{}", caller);
             throw new IllegalStateException(err);
         }
     }
@@ -1070,10 +1079,19 @@ final class AdvancedLeakAwareCompositeByteBuf extends WrappedCompositeByteBuf {
     @Override
     public boolean release(int decrement) {
         
-        tracking.addSuppressed(new RuntimeException("release(int): buf=" + unwrap() + ", refCnt=" + refCnt() + ", hashCode=" + System.identityHashCode(this)));
+        Caller element = new Caller("release(int): buf=" + unwrap() + ", refCnt=" + refCnt() + ", hashCode=" + System.identityHashCode(this));
+        caller.add(element);
         try {
             boolean deallocated = super.release(decrement);
+            
+            element.after("refCnt=" + refCnt() + ", deallocated=" + deallocated);
+            
             if (deallocated) {
+                
+                if (unwrap() instanceof PooledByteBuf) {
+                    logger.error("DEALLOCATE: timeStamp=" + Caller.timeStamp() + ", buf=" + unwrap() + ", hashCode=" + System.identityHashCode(this));
+                }
+                
                 leak.close();
             } else {
                 leak.record();
@@ -1081,8 +1099,8 @@ final class AdvancedLeakAwareCompositeByteBuf extends WrappedCompositeByteBuf {
             return deallocated;
             
         } catch (Throwable err) {
-            tracking.addSuppressed(err);
-            logger.error("IllegalStateException", tracking);
+            caller.add(new Caller(err.getMessage()));
+            logger.error("EXCEPTION:\n{}", caller);
             throw new IllegalStateException(err);
         }
     }
