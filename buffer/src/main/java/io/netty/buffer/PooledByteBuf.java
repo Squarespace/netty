@@ -16,11 +16,11 @@
 
 package io.netty.buffer;
 
-import io.netty.util.Recycler;
-import io.netty.util.Recycler.Handle;
-
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+
+import io.netty.util.Recycler;
+import io.netty.util.Recycler.Handle;
 
 abstract class PooledByteBuf<T> extends AbstractReferenceCountedByteBuf {
 
@@ -34,6 +34,8 @@ abstract class PooledByteBuf<T> extends AbstractReferenceCountedByteBuf {
     int maxLength;
     PoolThreadCache cache;
     private ByteBuffer tmpNioBuf;
+    
+    public Caller caller;
 
     @SuppressWarnings("unchecked")
     protected PooledByteBuf(Recycler.Handle<? extends PooledByteBuf<T>> recyclerHandle, int maxCapacity) {
@@ -165,6 +167,8 @@ abstract class PooledByteBuf<T> extends AbstractReferenceCountedByteBuf {
     @Override
     protected final void deallocate() {
         if (handle >= 0) {
+            this.caller = new Caller("deallocate(), type=" + getClass().getSimpleName() + ", hashCode=" + System.identityHashCode(this));
+            
             final long handle = this.handle;
             this.handle = -1;
             memory = null;

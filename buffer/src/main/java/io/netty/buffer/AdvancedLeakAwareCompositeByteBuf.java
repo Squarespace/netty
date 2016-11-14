@@ -1060,9 +1060,9 @@ final class AdvancedLeakAwareCompositeByteBuf extends WrappedCompositeByteBuf {
             
             if (deallocated) {
                 
-                if (unwrap() instanceof PooledByteBuf) {
+                /*if (unwrap() instanceof PooledByteBuf) {
                     logger.error("DEALLOCATE: timeStamp=" + Caller.timeStamp() + ", buf=" + unwrap() + ", hashCode=" + System.identityHashCode(this));
-                }
+                }*/
                 
                 leak.close();
             } else {

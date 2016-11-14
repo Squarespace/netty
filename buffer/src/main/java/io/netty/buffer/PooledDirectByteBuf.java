@@ -16,8 +16,6 @@
 
 package io.netty.buffer;
 
-import io.netty.util.Recycler;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -26,6 +24,8 @@ import java.nio.channels.ClosedChannelException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.GatheringByteChannel;
 import java.nio.channels.ScatteringByteChannel;
+
+import io.netty.util.Recycler;
 
 final class PooledDirectByteBuf extends PooledByteBuf<ByteBuffer> {
 

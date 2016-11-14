@@ -33,7 +33,6 @@ import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
 
 final class AdvancedLeakAwareByteBuf extends WrappedByteBuf {
-
     private static final String PROP_ACQUIRE_AND_RELEASE_ONLY = "io.netty.leakDetection.acquireAndReleaseOnly";
     private static final boolean ACQUIRE_AND_RELEASE_ONLY;
 
@@ -49,6 +48,7 @@ final class AdvancedLeakAwareByteBuf extends WrappedByteBuf {
 
     private final ResourceLeak leak;
     private final Caller caller;
+    private final ByteBuf parent;
     
     AdvancedLeakAwareByteBuf(ByteBuf buf, ResourceLeak leak) {
         this(buf, leak, null, null);
@@ -57,16 +57,22 @@ final class AdvancedLeakAwareByteBuf extends WrappedByteBuf {
     AdvancedLeakAwareByteBuf(ByteBuf buf, ResourceLeak leak, Caller parentCaller, ByteBuf parent) {
         super(buf);
         this.leak = leak;
+        this.parent = parent;
         
-        caller = new Caller("AdvancedLeakAwareByteBuf(): buf=" + buf + ", hashCode=" + System.identityHashCode(this) + foo(parent), parentCaller);
+        caller = new Caller("AdvancedLeakAwareByteBuf(): buf=" + buf + ", hashCode=" + System.identityHashCode(unwrap()) + parentInfo(parent), parentCaller);
     }
 
-    static String foo(ByteBuf parent) {
+    static String parentInfo(ByteBuf parent) {
         if (parent == null) {
             return "";
         }
         
-        return ", parent=" + parent + ", parentHashCode=" + System.identityHashCode(parent);
+        ByteBuf buf = parent;
+        if (buf instanceof WrappedByteBuf) {
+            buf = ((WrappedByteBuf)buf).unwrap();
+        }
+        
+        return ", parent=" + parent + ", parentHashCode=" + System.identityHashCode(buf);
     }
     
     static void recordLeakNonRefCountingOperation(ResourceLeak leak) {
@@ -964,7 +970,7 @@ final class AdvancedLeakAwareByteBuf extends WrappedByteBuf {
     @Override
     public boolean release() {
         
-        Caller element = new Caller("release(): buf=" + unwrap() + ", refCnt=" + refCnt() + ", hashCode=" + System.identityHashCode(this));
+        Caller element = new Caller("release(): buf=" + unwrap() + ", refCnt=" + refCnt() + ", hashCode=" + System.identityHashCode(unwrap()));
         caller.add(element);
         
         try {
@@ -974,9 +980,9 @@ final class AdvancedLeakAwareByteBuf extends WrappedByteBuf {
             
             if (deallocated) {
                 
-                if (unwrap() instanceof PooledByteBuf) {
-                    logger.error("DEALLOCATE: timeStamp=" + Caller.timeStamp() + ", buf=" + unwrap() + ", hashCode=" + System.identityHashCode(this));
-                }
+                /*if (unwrap() instanceof PooledByteBuf) {
+                    logger.error("DEALLOCATE: timeStamp=" + Caller.timeStamp() + ", buf=" + unwrap() + ", hashCode=" + System.identityHashCode(unwrap()));
+                }*/
                 
                 leak.close();
             } else {
@@ -985,7 +991,13 @@ final class AdvancedLeakAwareByteBuf extends WrappedByteBuf {
             return deallocated;
         } catch (Throwable err) {
             caller.add(new Caller(err.getMessage()));
-            logger.error("EXCEPTION:\n{}", caller);
+            
+            PooledByteBuf<?> pooled = unwrapPooledByteBuf(parent);
+            if (pooled != null) {
+                caller.add(pooled.caller);
+            }
+            
+            logger.error("---EXCEPTION:\n{}", caller);
             throw new IllegalStateException(err);
         }
     }
@@ -993,7 +1005,7 @@ final class AdvancedLeakAwareByteBuf extends WrappedByteBuf {
     @Override
     public boolean release(int decrement) {
         
-        Caller element = new Caller("release(int): buf=" + unwrap() + ", refCnt=" + refCnt() + ", hashCode=" + System.identityHashCode(this));
+        Caller element = new Caller("release(int): buf=" + unwrap() + ", refCnt=" + refCnt() + ", hashCode=" + System.identityHashCode(unwrap()));
         caller.add(element);
         
         try {
@@ -1003,9 +1015,9 @@ final class AdvancedLeakAwareByteBuf extends WrappedByteBuf {
             
             if (deallocated) {
                 
-                if (unwrap() instanceof PooledByteBuf) {
-                    logger.error("DEALLOCATE: timeStamp=" + Caller.timeStamp() + ", buf=" + unwrap() + ", hashCode=" + System.identityHashCode(this));
-                }
+                /*if (unwrap() instanceof PooledByteBuf) {
+                    logger.error("DEALLOCATE: timeStamp=" + Caller.timeStamp() + ", buf=" + unwrap() + ", hashCode=" + System.identityHashCode(unwrap()));
+                }*/
                 
                 leak.close();
             } else {
@@ -1015,8 +1027,35 @@ final class AdvancedLeakAwareByteBuf extends WrappedByteBuf {
             
         } catch (Throwable err) {
             caller.add(new Caller(err.getMessage()));
-            logger.error("EXCEPTION:\n{}", caller);
+            
+            PooledByteBuf<?> pooled = unwrapPooledByteBuf(parent);
+            if (pooled != null) {
+                caller.add(pooled.caller);
+            }
+            
+            logger.error("---EXCEPTION:\n{}", caller);
             throw new IllegalStateException(err);
         }
     }
+    
+    static PooledByteBuf<?> unwrapPooledByteBuf(ByteBuf buf) {
+        
+        if (buf instanceof PooledByteBuf<?>) {
+            return (PooledByteBuf<?>)buf;
+        }
+        
+        if (buf instanceof AdvancedLeakAwareByteBuf) {
+            
+            ByteBuf unwrapped = buf.unwrap();
+            if (unwrapped instanceof PooledByteBuf<?>) {
+                return (PooledByteBuf<?>)unwrapped;
+            }
+            
+            return unwrapPooledByteBuf(((AdvancedLeakAwareByteBuf)buf).parent);
+        }
+        
+        return null;
+    }
+    
+    
 }

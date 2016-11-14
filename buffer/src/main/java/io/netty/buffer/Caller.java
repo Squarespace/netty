@@ -42,6 +42,10 @@ public class Caller {
     }
     
     public void add(Caller caller) {
+        if (caller == null) {
+            return;
+        }
+        
         synchronized (Caller.class) {
             if (done) {
                 throw new IllegalStateException("caller=" + caller);
