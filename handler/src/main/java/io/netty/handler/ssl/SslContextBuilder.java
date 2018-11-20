@@ -16,20 +16,20 @@
 
 package io.netty.handler.ssl;
 
-import static io.netty.util.internal.ObjectUtil.checkNotNull;
-
 import io.netty.util.internal.UnstableApi;
-
-import java.security.Provider;
-import javax.net.ssl.KeyManagerFactory;
-import javax.net.ssl.SSLException;
-import javax.net.ssl.TrustManagerFactory;
 
 import java.io.File;
 import java.io.InputStream;
 import java.security.PrivateKey;
+import java.security.Provider;
 import java.security.cert.X509Certificate;
+
+import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLEngine;
+import javax.net.ssl.SSLException;
+import javax.net.ssl.TrustManagerFactory;
+
+import static io.netty.util.internal.ObjectUtil.checkNotNull;
 
 /**
  * Builder for configuring a new SslContext for creation.
@@ -149,6 +149,7 @@ public final class SslContextBuilder {
     private String[] protocols;
     private boolean startTls;
     private boolean enableOcsp;
+    private long maxEarlyData;
 
     private SslContextBuilder(boolean forServer) {
         this.forServer = forServer;
@@ -437,6 +438,11 @@ public final class SslContextBuilder {
         return this;
     }
 
+    public SslContextBuilder maxEarlyData(long maxEarlyData) {
+        this.maxEarlyData = maxEarlyData;
+        return this;
+    }
+
     /**
      * Create new {@code SslContext} instance with configured settings.
      * <p>If {@link #sslProvider(SslProvider)} is set to {@link SslProvider#OPENSSL_REFCNT} then the caller is
@@ -447,7 +453,7 @@ public final class SslContextBuilder {
             return SslContext.newServerContextInternal(provider, sslContextProvider, trustCertCollection,
                 trustManagerFactory, keyCertChain, key, keyPassword, keyManagerFactory,
                 ciphers, cipherFilter, apn, sessionCacheSize, sessionTimeout, clientAuth, protocols, startTls,
-                enableOcsp);
+                enableOcsp, maxEarlyData);
         } else {
             return SslContext.newClientContextInternal(provider, sslContextProvider, trustCertCollection,
                 trustManagerFactory, keyCertChain, key, keyPassword, keyManagerFactory,

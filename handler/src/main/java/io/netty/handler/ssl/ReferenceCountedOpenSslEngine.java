@@ -17,8 +17,6 @@ package io.netty.handler.ssl;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
-import io.netty.internal.tcnative.Buffer;
-import io.netty.internal.tcnative.SSL;
 import io.netty.util.AbstractReferenceCounted;
 import io.netty.util.CharsetUtil;
 import io.netty.util.ReferenceCounted;
@@ -32,6 +30,9 @@ import io.netty.util.internal.ThrowableUtil;
 import io.netty.util.internal.UnstableApi;
 import io.netty.util.internal.logging.InternalLogger;
 import io.netty.util.internal.logging.InternalLoggerFactory;
+
+import io.netty.internal.tcnative.Buffer;
+import io.netty.internal.tcnative.SSL;
 
 import java.nio.ByteBuffer;
 import java.nio.ReadOnlyBufferException;
@@ -501,6 +502,10 @@ public class ReferenceCountedOpenSslEngine extends SSLEngine implements Referenc
         // On shutdown clear all errors
         SSL.clearError();
     }
+    
+    public int getEarlyDataStatus() {
+        return SSL.getEarlyDataStatus(ssl);
+    }
 
     /**
      * Write plaintext data to the OpenSSL internal BIO
@@ -593,6 +598,53 @@ public class ReferenceCountedOpenSslEngine extends SSLEngine implements Referenc
         }
 
         return sslRead;
+    }
+    
+    private int bla(ByteBuffer dst) {
+        final int sslRead;
+        final int pos = dst.position();
+        
+        final long value;
+        
+        if (dst.isDirect()) {
+            value = SSL.readEarlyDataFromSSL(ssl, bufferAddress(dst) + pos, dst.limit() - pos);
+            
+            int status = earlyDataStatus(value);
+            sslRead = earlyDataLength(value);
+            if (sslRead > 0) {
+                dst.position(pos + sslRead);
+            }
+            
+            
+            
+        } else {
+            final int limit = dst.limit();
+            final int len = min(maxEncryptedPacketLength0(), limit - pos);
+            final ByteBuf buf = alloc.directBuffer(len);
+            try {
+                value = SSL.readEarlyDataFromSSL(ssl, memoryAddress(buf), len);
+                int status = earlyDataStatus(value);
+                sslRead = earlyDataLength(value);
+                
+                if (sslRead > 0) {
+                    dst.limit(pos + sslRead);
+                    buf.getBytes(buf.readerIndex(), dst);
+                    dst.limit(limit);
+                }
+            } finally {
+                buf.release();
+            }
+        }
+        
+        return sslRead;
+    }
+    
+    private static int earlyDataStatus(long value) {
+        return (int)(value >> 32) & Integer.MAX_VALUE;
+    }
+    
+    private static int earlyDataLength(long value) {
+        return (int)value & 0xFFFFFFFF;
     }
 
     /**

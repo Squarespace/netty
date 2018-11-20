@@ -39,9 +39,9 @@ public abstract class OpenSslContext extends ReferenceCountedOpenSslContext {
                    OpenSslApplicationProtocolNegotiator apn, long sessionCacheSize,
                    long sessionTimeout, int mode, Certificate[] keyCertChain,
                    ClientAuth clientAuth, String[] protocols, boolean startTls,
-                   boolean enableOcsp) throws SSLException {
+                   boolean enableOcsp, long maxEarlyData) throws SSLException {
         super(ciphers, cipherFilter, apn, sessionCacheSize, sessionTimeout, mode, keyCertChain, clientAuth, protocols,
-                startTls, enableOcsp, false);
+                startTls, enableOcsp, maxEarlyData, false);
     }
 
     @Override

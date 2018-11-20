@@ -189,14 +189,14 @@ public abstract class ReferenceCountedOpenSslContext extends SslContext implemen
                                    int mode, Certificate[] keyCertChain, ClientAuth clientAuth, String[] protocols,
                                    boolean startTls, boolean enableOcsp, boolean leakDetection) throws SSLException {
         this(ciphers, cipherFilter, toNegotiator(apnCfg), sessionCacheSize, sessionTimeout, mode, keyCertChain,
-                clientAuth, protocols, startTls, enableOcsp, leakDetection);
+                clientAuth, protocols, startTls, enableOcsp, 0L, leakDetection);
     }
 
     ReferenceCountedOpenSslContext(Iterable<String> ciphers, CipherSuiteFilter cipherFilter,
                                    OpenSslApplicationProtocolNegotiator apn, long sessionCacheSize,
                                    long sessionTimeout, int mode, Certificate[] keyCertChain,
                                    ClientAuth clientAuth, String[] protocols, boolean startTls, boolean enableOcsp,
-                                   boolean leakDetection) throws SSLException {
+                                   long maxEarlyData, boolean leakDetection) throws SSLException {
         super(startTls);
 
         OpenSsl.ensureAvailability();
@@ -298,6 +298,10 @@ public abstract class ReferenceCountedOpenSslContext extends SslContext implemen
 
             if (DH_KEY_LENGTH != null) {
                 SSLContext.setTmpDHLength(ctx, DH_KEY_LENGTH);
+            }
+            
+            if (maxEarlyData > 0L) {
+                SSLContext.setMaxEarlyData(ctx, maxEarlyData);
             }
 
             List<String> nextProtoList = apn.protocols();

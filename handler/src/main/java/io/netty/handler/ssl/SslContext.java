@@ -386,7 +386,7 @@ public abstract class SslContext {
                                             trustManagerFactory, toX509Certificates(keyCertChainFile),
                                             toPrivateKey(keyFile, keyPassword),
                                             keyPassword, keyManagerFactory, ciphers, cipherFilter, apn,
-                                            sessionCacheSize, sessionTimeout, ClientAuth.NONE, null, false, false);
+                                            sessionCacheSize, sessionTimeout, ClientAuth.NONE, null, false, false, 0L);
         } catch (Exception e) {
             if (e instanceof SSLException) {
                 throw (SSLException) e;
@@ -402,7 +402,7 @@ public abstract class SslContext {
             X509Certificate[] keyCertChain, PrivateKey key, String keyPassword, KeyManagerFactory keyManagerFactory,
             Iterable<String> ciphers, CipherSuiteFilter cipherFilter, ApplicationProtocolConfig apn,
             long sessionCacheSize, long sessionTimeout, ClientAuth clientAuth, String[] protocols, boolean startTls,
-            boolean enableOcsp) throws SSLException {
+            boolean enableOcsp, long maxEarlyData) throws SSLException {
 
         if (provider == null) {
             provider = defaultServerProvider();
@@ -422,13 +422,13 @@ public abstract class SslContext {
             return new OpenSslServerContext(
                     trustCertCollection, trustManagerFactory, keyCertChain, key, keyPassword,
                     keyManagerFactory, ciphers, cipherFilter, apn, sessionCacheSize, sessionTimeout,
-                    clientAuth, protocols, startTls, enableOcsp);
+                    clientAuth, protocols, startTls, enableOcsp, maxEarlyData);
         case OPENSSL_REFCNT:
             verifyNullSslContextProvider(provider, sslContextProvider);
             return new ReferenceCountedOpenSslServerContext(
                     trustCertCollection, trustManagerFactory, keyCertChain, key, keyPassword,
                     keyManagerFactory, ciphers, cipherFilter, apn, sessionCacheSize, sessionTimeout,
-                    clientAuth, protocols, startTls, enableOcsp);
+                    clientAuth, protocols, startTls, enableOcsp, maxEarlyData);
         default:
             throw new Error(provider.toString());
         }
