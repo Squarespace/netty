@@ -224,6 +224,8 @@ public class ReferenceCountedOpenSslEngine extends SSLEngine implements Referenc
     private int maxWrapOverhead;
     private int maxWrapBufferSize;
 
+    private boolean earlyDataComplete;
+    
     // This is package-private as we set it from OpenSslContext if an exception is thrown during
     // the verification step.
     SSLHandshakeException handshakeException;
@@ -502,7 +504,10 @@ public class ReferenceCountedOpenSslEngine extends SSLEngine implements Referenc
         // On shutdown clear all errors
         SSL.clearError();
     }
-    
+
+    /**
+     * https://www.openssl.org/docs/man1.1.1/man3/SSL_get_early_data_status.html
+     */
     public int getEarlyDataStatus() {
         return SSL.getEarlyDataStatus(ssl);
     }
@@ -513,6 +518,14 @@ public class ReferenceCountedOpenSslEngine extends SSLEngine implements Referenc
      * Calling this function with src.remaining == 0 is undefined.
      */
     private int writePlaintextData(final ByteBuffer src, int len) {
+        if (!earlyDataComplete) {
+            Thread.dumpStack();
+        }
+        
+        return writePlaintextData0(src, len);
+    }
+    
+    private int writePlaintextData0(final ByteBuffer src, int len) {
         final int pos = src.position();
         final int limit = src.limit();
         final int sslWrote;
@@ -569,11 +582,92 @@ public class ReferenceCountedOpenSslEngine extends SSLEngine implements Referenc
         }
         return null;
     }
+    
+    private int readPlaintextData(ByteBuffer dst) {
+        /*if (earlyDataComplete || handshakeState != HandshakeState.FINISHED) {
+            return readNonEarlyPlaintextData(dst);
+        } else {
+            return readEarlyPlaintextData(dst);
+        }*/
+        
+        /*int earlyData = earlyData(dst);
+        if (earlyData != -1) {
+            return earlyData;
+        }*/
+        
+        return readNonEarlyPlaintextData(dst);
+    }
+    
+    /**
+     * 
+     */
+    private int earlyData(ByteBuffer dst) {
+        
+        Thread.dumpStack();
+        
+        if (earlyDataComplete) {
+            return -1;
+        }
+        
+        final int status;
+        final int sslRead;
+        final int pos = dst.position();
+        
+        if (dst.isDirect()) {
+            long statusLength = SSL.readEarlyDataFromSSL(ssl, bufferAddress(dst) + pos, dst.limit() - pos);
 
+            status = earlyDataStatus(statusLength);
+            sslRead = earlyDataLength(statusLength);
+            if (sslRead > 0) {
+                dst.position(pos + sslRead);
+            }
+        } else {
+            final int limit = dst.limit();
+            final int len = min(maxEncryptedPacketLength0(), limit - pos);
+            final ByteBuf buf = alloc.directBuffer(len);
+            try {
+                long statusLength = SSL.readEarlyDataFromSSL(ssl, memoryAddress(buf), len);
+
+                status = earlyDataStatus(statusLength);
+                sslRead = earlyDataLength(statusLength);
+                
+                if (sslRead > 0) {
+                    dst.limit(pos + sslRead);
+                    buf.getBytes(buf.readerIndex(), dst);
+                    dst.limit(limit);
+                }
+            } finally {
+                buf.release();
+            }
+        }
+        
+        int status2 = 0;//getEarlyDataStatus();
+        
+        if (status == SSL.SSL_READ_EARLY_DATA_SUCCESS) {
+            System.out.println("SSL_READ_EARLY_DATA_SUCCESS[" + status + "]" + status2);
+            
+        } else if (status == SSL.SSL_READ_EARLY_DATA_FINISH) {
+            System.out.println("SSL_READ_EARLY_DATA_FINISH[" + status + "]" + status2);
+            
+        } else if (status == SSL.SSL_READ_EARLY_DATA_ERROR) {
+            System.out.println("SSL_READ_EARLY_DATA_ERROR[" + status + "]" + status2);
+            
+        } else {
+            System.out.println("UNKNOWN[" + status + "]" + status2);
+        }
+        
+        if (status == SSL.SSL_READ_EARLY_DATA_FINISH
+                || status == SSL.SSL_READ_EARLY_DATA_ERROR) {
+            earlyDataComplete = true;
+        }
+        
+        return sslRead;
+    }
+    
     /**
      * Read plaintext data from the OpenSSL internal BIO
      */
-    private int readPlaintextData(final ByteBuffer dst) {
+    private int readNonEarlyPlaintextData(final ByteBuffer dst) {
         final int sslRead;
         final int pos = dst.position();
         if (dst.isDirect()) {
@@ -600,53 +694,6 @@ public class ReferenceCountedOpenSslEngine extends SSLEngine implements Referenc
         return sslRead;
     }
     
-    private int bla(ByteBuffer dst) {
-        final int sslRead;
-        final int pos = dst.position();
-        
-        final long value;
-        
-        if (dst.isDirect()) {
-            value = SSL.readEarlyDataFromSSL(ssl, bufferAddress(dst) + pos, dst.limit() - pos);
-            
-            int status = earlyDataStatus(value);
-            sslRead = earlyDataLength(value);
-            if (sslRead > 0) {
-                dst.position(pos + sslRead);
-            }
-            
-            
-            
-        } else {
-            final int limit = dst.limit();
-            final int len = min(maxEncryptedPacketLength0(), limit - pos);
-            final ByteBuf buf = alloc.directBuffer(len);
-            try {
-                value = SSL.readEarlyDataFromSSL(ssl, memoryAddress(buf), len);
-                int status = earlyDataStatus(value);
-                sslRead = earlyDataLength(value);
-                
-                if (sslRead > 0) {
-                    dst.limit(pos + sslRead);
-                    buf.getBytes(buf.readerIndex(), dst);
-                    dst.limit(limit);
-                }
-            } finally {
-                buf.release();
-            }
-        }
-        
-        return sslRead;
-    }
-    
-    private static int earlyDataStatus(long value) {
-        return (int)(value >> 32) & Integer.MAX_VALUE;
-    }
-    
-    private static int earlyDataLength(long value) {
-        return (int)value & 0xFFFFFFFF;
-    }
-
     /**
      * Visible only for testing!
      */
@@ -1718,6 +1765,15 @@ public class ReferenceCountedOpenSslEngine extends SSLEngine implements Referenc
             lastAccessed = System.currentTimeMillis();
         }
 
+        int earlyData = earlyData(ByteBuffer.allocate(16*1024));
+        if (earlyData >= 0) {
+            System.out.println("handshake: earlyData=" + earlyData);
+        }
+        
+        if (!earlyDataComplete) {
+            
+        }
+        
         int code = SSL.doHandshake(ssl);
         if (code <= 0) {
             // Check if we have a pending exception that was created during the handshake and if so throw it after
@@ -1738,9 +1794,13 @@ public class ReferenceCountedOpenSslEngine extends SSLEngine implements Referenc
             }
         }
         // if SSL_do_handshake returns > 0 or sslError == SSL.SSL_ERROR_NAME it means the handshake was finished.
+        onHandshaleComplete();
+        return FINISHED;
+    }
+    
+    private void onHandshaleComplete() throws SSLException {
         session.handshakeFinished();
         engineMap.remove(ssl);
-        return FINISHED;
     }
 
     private SSLEngineResult.HandshakeStatus mayFinishHandshake(SSLEngineResult.HandshakeStatus status)
@@ -1981,6 +2041,20 @@ public class ReferenceCountedOpenSslEngine extends SSLEngine implements Referenc
             return PlatformDependent.directBufferAddress(b);
         }
         return Buffer.address(b);
+    }
+
+    /**
+     * The upper 32 bits are the status
+     */
+    private static int earlyDataStatus(long statusLength) {
+        return (int)(statusLength >> 32L) & Integer.MAX_VALUE;
+    }
+
+    /**
+     * The lower 32 bits are the length
+     */
+    private static int earlyDataLength(long statusLength) {
+        return (int)(statusLength & 0xFFFFFFFFL);
     }
 
     private final class DefaultOpenSslSession implements OpenSslSession  {

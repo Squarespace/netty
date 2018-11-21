@@ -17,6 +17,8 @@ package io.netty.handler.ssl;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
+
+import io.netty.internal.tcnative.AllowEarlyDataCallback;
 import io.netty.internal.tcnative.CertificateVerifier;
 import io.netty.internal.tcnative.SSL;
 import io.netty.internal.tcnative.SSLContext;
@@ -302,6 +304,13 @@ public abstract class ReferenceCountedOpenSslContext extends SslContext implemen
             
             if (maxEarlyData > 0L) {
                 SSLContext.setMaxEarlyData(ctx, maxEarlyData);
+                SSLContext.setAllowEarlyDataCallback(ctx, new AllowEarlyDataCallback() {
+                    @Override
+                    public boolean allow(long ssl) {
+                        Thread.dumpStack();
+                        return true;
+                    }
+                });
             }
 
             List<String> nextProtoList = apn.protocols();

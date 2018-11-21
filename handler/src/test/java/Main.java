@@ -9,16 +9,13 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.ssl.OpenSslEngine;
 import io.netty.handler.ssl.OpenSslSessionContext;
+import io.netty.handler.ssl.OpenSslSessionTicketKey;
 import io.netty.handler.ssl.SslContext;
 import io.netty.handler.ssl.SslContextBuilder;
 import io.netty.handler.ssl.SslHandler;
 import io.netty.handler.ssl.SslProvider;
 import io.netty.handler.ssl.util.SelfSignedCertificate;
 import io.netty.util.ReferenceCountUtil;
-
-import io.netty.internal.tcnative.SSL;
-
-import java.security.SecureRandom;
 
 public class Main {
 
@@ -34,13 +31,13 @@ public class Main {
         byte[] hmacKey = new byte[16];
         byte[] aesKey = new byte[16];
         
-        SecureRandom random = new SecureRandom();
+        /*SecureRandom random = new SecureRandom();
         random.nextBytes(name);
         random.nextBytes(hmacKey);
-        random.nextBytes(aesKey);
+        random.nextBytes(aesKey);*/
         
         OpenSslSessionContext sessionContext = (OpenSslSessionContext)sslContext.sessionContext();
-        //sessionContext.setTicketKeys(new OpenSslSessionTicketKey(name, hmacKey, aesKey));
+        sessionContext.setTicketKeys(new OpenSslSessionTicketKey(name, hmacKey, aesKey));
 
         ChannelInitializer<Channel> handler = new ChannelInitializer<Channel>() {
             @Override
@@ -57,7 +54,7 @@ public class Main {
                         ReferenceCountUtil.release(msg);
                     }
 
-                    @Override
+                    /*@Override
                     public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception {
                         int status = engine.getEarlyDataStatus();
     
@@ -73,7 +70,7 @@ public class Main {
                             System.out.println("UNKNOWN: " + status);
                         }
                         ctx.fireUserEventTriggered(evt);
-                    }
+                    }*/
                 });
             }
         };
